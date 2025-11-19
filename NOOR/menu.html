@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>NOOR Menu</title>
+  <link rel="icon" type="image/png" href="favicon.png">
+  <style>
+    /* price badge overlay */
+  .card { position: relative; }                  /* enable absolute positioning inside */
+  .price-badge{
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
+    padding: .4rem .6rem;
+    font-weight: 700;
+    font-size: .9rem;
+    background: #5d7a73;       /* change to your brand color; olive-ish like screenshot */
+    color: #fff;
+    border-radius: 999px;       /* pill */
+    box-shadow: 0 2px 6px rgba(0,0,0,.2);
+  }
+  .img-wrap {
+    position: relative;
+  }
+  
+
+
+    :root{
+      --bg:#eaf1f0;         /* plain background */
+      --text:#5d7a73;       /* main text */
+      --muted:#6b7280;      /* secondary text */
+      --accent:#5d7a73;     /* active tab color */
+      --card:#f2f3f6;       /* card bg */
+      --nav-bg:#eaf1f0;     /* navbar bg */
+      --border:#e5e7eb;     /* borders */
+      --content-max:1200px; /* navbar max width */
+      --pad:1rem;
+      --radius:14px;
+      --nav-h:64px;         /* computed at runtime */
+    }
+
+    *{box-sizing:border-box}
+    html,body{
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;
+      background:var(--bg); color:var(--text);
+      line-height:1.5;
+      padding-top:var(--nav-h); /* account for fixed navbar */
+    }
+
+    /* ===== NAVBAR ===== */
+    .navbar-wrap{position:fixed;top:0;left:0;right:0;z-index:60;}
+    nav.navbar{
+      display:flex;align-items:center;gap:.75rem;
+      max-width:var(--content-max);margin:0 auto;padding:.5rem var(--pad);
+      min-height:var(--nav-h);background:var(--nav-bg);
+      border-bottom:1px solid var(--border);
+    }
+    .nav-brand{font-weight:800;font-size:1.1rem;text-decoration:none;color:var(--text);white-space:nowrap}
+    .nav-brand:hover{color:var(--accent)}
+
+    .cat-scroll{flex:1;overflow:auto hidden;scrollbar-width:none;-ms-overflow-style:none;position:relative;mask-image:linear-gradient(90deg,transparent 0,#000 24px,#000 calc(100% - 24px),transparent 100%);} 
+    .cat-scroll::-webkit-scrollbar{display:none}
+    .cat-list{display:flex;gap:.25rem;align-items:center;padding:.25rem;flex-wrap:nowrap;}
+    .cat-list a{--p:.55rem .9rem;--r:999px;display:inline-flex;align-items:center;gap:.5ch;padding:var(--p);border-radius:var(--r);text-decoration:none;color:var(--text);white-space:nowrap;font-size:.95rem;border:1px solid transparent;transition:background .2s ease,color .2s ease,border-color .2s ease;}
+    .cat-list a:hover{background:#1118270d;border-color:#1118271a}
+    .cat-list a.active,.cat-list a[aria-current="true"]{background:var(--accent);color:#fff}
+
+    /* ===== PAGE LAYOUT ===== */
+    .menu-header{display:flex;justify-content:center;align-items:center;padding:1rem 0;}
+    .menu-logo{width:200px;height:200px;object-fit:cover;border-radius:50%;border:1px solid var(--border);background:transparent}
+
+    .container{width: 68%;max-width:550px;margin:0 auto;padding:1rem 0;}
+    @media (min-width:768px){.container{width:62%;}}
+    @media (min-width:1200px){.container{width:60%;}}
+
+    /* Sections */
+    section.category{scroll-margin-top:calc(var(--nav-h)+16px);padding:1rem 0 1.25rem;scroll-margin-top: 64px;}
+    .category .head{display:flex;justify-content:space-between;align-items:end;gap:1rem;margin:0 0 .75rem}
+    .category h2{margin:0;font-size:clamp(1.2rem,.9rem+1.1vw,1.6rem)}
+    .category .sub{color:var(--muted);font-size:.95rem}
+
+
+    /* One product per row (stacked) */
+    .grid{display:flex;flex-direction:column;gap:12px}
+    .card{background:var(--card);border:2px solid var(--border);border-radius:var(--radius);overflow:hidden;display:flex;flex-direction:column;min-height:100%}
+    .card img{display:block;width:100%;aspect-ratio:3/4;object-fit:cover;background:#f3f4f6}
+    .card .meta{padding:.6rem .7rem}
+    .title{font-weight:600}
+    .desc{color:var(--muted);font-size:.9rem}
+  </style>
+
+</head>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const sections = document.querySelectorAll("section.category");
+  const navLinks = document.querySelectorAll(".cat-list a");
+
+  function activateLink(id) {
+    navLinks.forEach(link => {
+      link.classList.toggle("active", link.getAttribute("href") === "#" + id);
+    });
+  }
+
+  function scrollActiveLinkIntoView() {
+    const activeLink = document.querySelector(".cat-list a.active");
+    if (activeLink) {
+      activeLink.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+    }
+  }
+
+  // Detect which section is in view
+  window.addEventListener("scroll", () => {
+    let current = "";
+    sections.forEach(section => {
+      const rect = section.getBoundingClientRect();
+      if (rect.top <= 150 && rect.bottom >= 150) {
+        current = section.getAttribute("id");
+      }
+    });
+
+    if (current) {
+      activateLink(current);
+      scrollActiveLinkIntoView();
+    }
+  });
+
+  // Smooth scroll for navbar clicks
+  navLinks.forEach(link => {
+    link.addEventListener("click", e => {
+      e.preventDefault();
+      const target = document.querySelector(link.getAttribute("href"));
+      target.scrollIntoView({ behavior: "smooth" });
+      activateLink(target.id);
+      scrollActiveLinkIntoView();
+    });
+  });
+});
+</script>
+
+<body>
+  <!-- NAVBAR -->
+  <div class="navbar-wrap" id="navbarWrap">
+    <nav class="navbar" id="navbar" role="navigation" aria-label="Category navigation">
+      <a href="#top" class="nav-brand">NOOR</a>
+      <div class="cat-scroll" id="catScroll">
+        <div class="cat-list" id="catList">
+          <a href="#brunch">Brunch</a>
+          <a href="#salads">Salads</a>
+          <a href="#soups">Soups</a>
+          <a href="#panini-piadinas">Panini &amp; Piadinas</a>
+          <a href="#pasta">Pasta</a>
+          <a href="#risottos">Risottos</a>
+          <a href="#chicken-filets">Chicken Fillets</a>
+          <a href="#pinsa">Pinsa</a>
+          <a href="#desserts">Desserts</a>
+          <a href="#antipasts">Appetizers</a>
+          <a href="#sigaperitifs">Signature Aperitifs</a>
+          <a href="#aperitifs">Aperitifs</a>
+          <a href="#sigcocktails">Signature Cocktails</a>
+          <a href="#classcocktails">Classic Cocktails</a>
+          <a href="#winebyglass">Wine By Glass</a>
+          <a href="#bottledbeers">Bottled Beers</a>
+          <a href="#draftbeer">Draft Beer</a>
+          <a href="#raki">Raki</a>
+          <a href="#gin">Gin</a>
+          <a href="#vodka">Vodka</a>
+          <a href="#rum">Rum</a>
+          <a href="#whiskey">Whiskey</a>
+          <a href="#amaro">Amaro</a>
+          <a href="#cognac">Cognac</a>
+          <a href="#hotdrinks">Hot Drinks</a>
+          <a href="#colddrinks">Cold Drinks</a>
+          <a href="#juicessmoothies">Juices & Smoothies</a>
+        </div>
+      </div>
+    </nav>
+  </div>
+
+  <!-- HEADER: centered image only -->
+  <header class="menu-header" id="top">
+    <!-- Replace src with your header photo/logo (square) -->
+    <img class="menu-logo" src="logo.png" alt="NOOR header image placeholder" />
+  </header>
+
+  <!-- CONTENT -->
+  <div class="container">
+
+    <!-- ======= CATEGORIES ======= -->
+
+    <section class="category" id="brunch" data-label="Brunch">
+      <div class="head"><h2>Brunch</h2><div class="sub" style="text-align: right;">9 am - 12 pm on weekdays<br>9 am - 3 pm on weekends</div></div>
+      <div class="grid">
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="Fotot/Brunch/Yummy Noor Avocado.jpeg" alt="YUMMY NOOR AVOCADO"><span class="price-badge">950 lek</span></div><div class="meta"><div class="title">YUMMY NOOR AVOCADO</div><div class="desc">Salmon, Avokado, Vezë Poshe, Krem Djathi, Salcë Portokalli, Pomodorini, Lime <br>Salmon, Avocado, Poached Eggs, Cream Cheese, Orange Dressing, Cherry Tomato, Lime </div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="Fotot/Brunch/Egg & Avocado.jpeg" alt="EGG & AVOCADO PIADINA "><span class="price-badge">790 lek</span></div><div class="meta"><div class="title">EGG & AVOCADO PIADINA </div><div class="desc">Piadinë, Vezë, Avokado, Proshutë Pule, Spinaq, Pomodorini, Salcë Caesar, Grana Padano <br>Wrap, Egg, Avocado, Chicken Ham, Spinach, Cherry Tomato, Caesar Sauce, Grana Padano</div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="Fotot/Brunch/muesi bowl.jpg" alt="MUESLI BOWL"><span class="price-badge">650 lek</span></div><div class="meta"><div class="title">MUESLI BOWL</div><div class="desc">Musli, Fruta Pylli, Banane, Gjalpë Kikiriku, Kos <br>Muesli, Forest Fruits, Banana, Peanut Butter, Yogurt</div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="Fotot/Brunch/egg benedict.jpeg" alt="EGGS BENEDICT"><span class="price-badge">700 lek</span></div><div class="meta"><div class="title">EGGS BENEDICT</div><div class="desc">Vezë Poshe, Pancetë, Salcë Hollandeze, Pomodorini <br>Poached Eggs, Bacon, Hollandaise Sauce, Cherry Tomato</div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="Fotot/Brunch/Chocofruit waffle 2.jpeg" alt="CHOCOFRUITS WAFFLE"><span class="price-badge">750 lek</span></div><div class="meta"><div class="title">CHOCOFRUITS WAFFLE</div><div class="desc">Waffle, Nutella, Luleshtrydhe, Banane, Fruta të Thata Miks <br>Waffle, Nutella, Strawberry, Banana, Mix of Dried Fruits</div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="PISTACCHIO WAFFLE"><span class="price-badge">800 lek</span></div><div class="meta"><div class="title">PISTACCHIO WAFFLE</div><div class="desc">Waffle, Krem Pistakio, Pistakio Kokërr, Luleshtrydhe <br>Waffle, Pistachio Cream, Pistachio, Strawberry</div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="FRENCH TOAST"><span class="price-badge">700 lek</span></div><div class="meta"><div class="title">FRENCH TOAST</div><div class="desc">Bukë Briosh, Miks Qumësht & Vezë, Fruta, Shurup Panje <br>Brioche Bread, Mix of Milk & Eggs, Fruits, Maple Syrup</div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="Fotot/Brunch/Croque Madame.jpeg" alt="CROQUE MADAME"><span class="price-badge">700 lek</span></div><div class="meta"><div class="title">CROQUE MADAME</div><div class="desc">Vezë, Proshutë Pule, Beshamel, Mocarela, Djathë Guda, Krem Djathi <br>Egg, Chicken Ham, Béchamel, Mozzarella, Gouda Cheese, Cream Cheese</div></div></article>
+      </div>
+    </section>
+
+    <section class="category" id="salads" data-label="Salads">
+      <div class="head"><h2>Salads</h2><div class="sub"></div></div>
+      <div class="grid">
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="KAPREZE / Caprese"><span class="price-badge">650 lek</span></div><div class="meta"><div class="title">KAPREZE / Caprese</div><div class="desc">Mocarela, Pomodorini, Borzilok <br>Mozzarella, Cherry Tomato, Basil</div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="Fotot/Salads/Avokado & Fileto Pule.jpeg" alt="AVOKADO & FILETO PULE / Avocado & Chicken Fillet"><span class="price-badge">690 lek</span></div><div class="meta"><div class="title">AVOKADO & FILETO PULE / Avocado & Chicken Fillet</div><div class="desc">Sallatë Miks, Rukola, Avokado, Fileto Pule, Domate e Thatë, Grana Padano, Pomodorini, Kastravec, Shkopinj Buke, Salcë Mustarde <br>Mix Salad, Arugula, Avocado, Chicken Fillet, Sun Dried Tomato, Grana Padano, Cherry Tomato, Cucumber, Grissini, Mustard Dressing</div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="Fotot/Salads/Ceasar.jpeg" alt="CEZAR / Caesar"><span class="price-badge">700 lek</span></div><div class="meta"><div class="title">CEZAR / Caesar</div><div class="desc">Fileto Pule, Sallatë Jeshile, Sallatë Ajsberg, Misër, Pomodorini, Grana Padano, Salcë Cezar <br>Chicken Fillet, Lettuce, Iceberg Salad, Corn, Cherry Tomato, Grana Padano, Caesar Dressing</div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="SALMON & AVOKADO / Salmon & Avocado "><span class="price-badge">850 lek</span></div><div class="meta"><div class="title">SALMON & AVOKADO / Salmon & Avocado </div><div class="desc">Salmon, Avokado, Sallatë Jeshile, Rukola, Pomodorini, Kastravec, Salcë Shef <br>Salmon, Avocado, Lettuce, Arugula, Cherry Tomato, Cucumber, Chef Dressing</div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="Fotot/Salads/burrata.jpg" alt="BURRATA & CRUDO"><span class="price-badge">750 lek</span></div><div class="meta"><div class="title">BURRATA & CRUDO </div><div class="desc">Proshutë Krudo, Burrata, Rukola, Pomodorini, Salcë Shef <br>Raw Ham, Burrata, Arugula, Cherry Tomato, Chef Dressing</div></div></article>
+      </div>
+    </section>
+
+    <section class="category" id="soups" data-label="Soups">
+      <div class="head"><h2>Soups</h2><div class="sub"></div></div>
+      <div class="grid">
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="SUPA E DITËS / TODAY’S SOUP"><span class="price-badge">400 lek</span></div><div class="meta"><div class="title">SUPA E DITËS / TODAY’S SOUP</div><div class="desc"></div></div></article>
+      </div>
+    </section>
+
+    <section class="category" id="panini-piadinas" data-label="Panini &amp; Piadinas">
+      <div class="head"><h2>Panini &amp; Piadinas</h2><div class="sub"></div></div>
+      <div class="grid">
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="TRENGJYRESHE / Three Colors"><span class="price-badge">Panini: 530 lek <br>Piadina: 580 lek</span></div><div class="meta"><div class="title">TRENGJYRESHE / Three Colors</div><div class="desc">Cabata, Fokaçe, Straçatel, Proshutë Krudo, Domate e Thatë, Borzilok, Pesto Genovese <br>Ciabatta, Focaccia, Stracciatella, Row Ham, Sun Dried Tomato, Basil, Genovese Pesto</div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="PANCETË & FILETO PULE / Bacon & Chicken Fillet"><span class="price-badge">Panini: 510 lek <br>Piadina: 560 lek</span></div><div class="meta"><div class="title">PANCETË & FILETO PULE / Bacon & Chicken Fillet</div><div class="desc">Cabata, Pancetë, Fileto Pule, Rukola, Kastravec, Salcë e Bardhë <br>Ciabatta, Bacon, Chicken Fillet, Arugula, Cucumber, White Sauce</div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="CEZAR / Caesar"><span class="price-badge">Panini: 400 lek <br>Piadina: 450 lek</span></div><div class="meta"><div class="title">CEZAR / Caesar</div><div class="desc">Cabata, Fileto Pule, Sallatë Jeshile, Grana Padano, Salcë Cezar <br>Ciabatta, Chicken Fillet, Lettuce, Grana Padano, Caesar Sauce</div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="VEZË TË SKUQURA / Fried Eggs"><span class="price-badge">Panini: 400 lek <br>Piadina: 450 lek</span></div><div class="meta"><div class="title">VEZË TË SKUQURA / Fried Eggs</div><div class="desc">Cabata, Vezë, Proshutë Koto, Provolone, Spinaq, Salcë Cezar <br>Ciabatta, Egg, Ham, Provolone, Spinach, Caesar Sauce</div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="Fotot/Panini & Piadina/chili.jpg" alt="CHILI"><span class="price-badge">Panini: 530 lek <br>Piadina: 580 lek</span></div><div class="meta"><div class="title">CHILI</div><div class="desc">Fokaçe, Spianata Pikante, Provolone, Spec i Kuq, Rukola, Tabasco, Salcë Roze <br>Focaccia, Spianata Piccante, Provolone, Red Pepper, Arugula, Tabasco, Rose Sauce</div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="KAPRESE / Caprese"><span class="price-badge">Panini: 450 lek <br>Piadina: 500 lek</span></div><div class="meta"><div class="title">KAPRESE / Caprese</div><div class="desc">Cabata, Mocarela, Domate, Borzilok, Pesto Genovese <br>Ciabatta, Mozzarella, Tomato, Basil, Genovese Pesto</div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="Fotot/Panini & Piadina/krudo.jpg" alt="KRUDO / Crudo"><span class="price-badge">Panini: 530 lek <br>Piadina: 580 lek</span></div><div class="meta"><div class="title">KRUDO / Crudo</div><div class="desc">Fokaçe, Proshutë Krudo, Kungull, Krem Tartufi, Krem Pekorino <br>Focaccia, Raw Ham, Zucchini, Truffle Cream, Pecorino Cream</div></div></article>
+      </div>
+    </section>
+
+    <section class="category" id="pasta" data-label="Pasta">
+      <div class="head"><h2>Pasta</h2><div class="sub"></div></div>
+      <div class="grid">
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="Fotot/Pasta/paceri guanciale dhe stracatela.jpg" alt="PACCHERI GUANCIALE & STRACCIATELLA"><span class="price-badge">750 lek</span></div><div class="meta"><div class="title">PACCHERI GUANCIALE & STRACCIATELLA</div><div class="desc">Pakeri të Freskëta, Guanciale, Stacciatella, Salcë Domate, Borzilok, Grana Padano<br>Fresh Paccheri, Guanciale, Stracciatella, Tomato Sauce, Basil, Grana Padano</div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="POMODORINI & BORZILOK / Cherry Tomato & Basil"><span class="price-badge">650 lek</span></div><div class="meta"><div class="title">POMODORINI & BORZILOK / Cherry Tomato & Basil</div><div class="desc">Linguine të Freskëta, Pomodorini, Borzilok, Pesto Genovese, Grana Padano <br>Fresh Linguine, Cherry Tomato, Basil, Genovese Pesto, Grana Padano</div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="Fotot/Pasta/Amatriciana.jpeg" alt="AMATRICIANA"><span class="price-badge">750 lek</span></div><div class="meta"><div class="title">AMATRICIANA</div><div class="desc">Linguine të Freskëta, Pancetë, Pomodorini, Salcë Domate, Tabasco, Grana Padano <br>Fresh Linguine, Bacon, Cherry Tomato, Tomato Sauce, Tabasco, Grana Padano</div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="ARRABIATA"><span class="price-badge">600 lek</span></div><div class="meta"><div class="title">ARRABIATA</div><div class="desc">Rigatoni të Freskëta, Salcë Domate, Hudhër, Spec Djegës, Majdanoz, Grana Padano <br>Fresh Rigatoni, Tomato Sauce, Garlic, Chili Pepper, Parsley, Grana Padano</div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="PANCETË, KËRPUDHË & TARTUF / Bacon Mushroom & Truffle"><span class="price-badge">790 lek</span></div><div class="meta"><div class="title">PANCETË, KËRPUDHË & TARTUF / Bacon Mushroom & Truffle</div><div class="desc">Tagliatelle të Freskëta, Pancetë, Kërpudha, Krem Tartufi, Grana Padano, Pana <br>Fresh Tagliatelle, Bacon, Mushroom, Truffle Cream, Grana Padano, Heavy Cream</div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="Fotot/Pasta/Carbonara.jpeg" alt="CARBONARA"><span class="price-badge">790 lek</span></div><div class="meta"><div class="title">CARBONARA</div><div class="desc">Rigatoni të Freskëta, Guanciale, Vezë, Pecorino Romano, Grana Padano <br>Fresh Rigatoni, Guanciale, Egg, Pecorino Romano, Grana Padano</div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="AGLIO, OLIO & PEPERONCINO "><span class="price-badge">600 lek</span></div><div class="meta"><div class="title">AGLIO, OLIO & PEPERONCINO </div><div class="desc">Linguine të Freskëta, Hudhër, Vaj Ulliri, Spec Djegës, Grana Padano <br>Fresh Linguine, Garlic, Olive Oil, Chili Pepper, Grana Padano</div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="Fotot/Pasta/Rigatoni Fileto pule & Mocarela.jpeg" alt="FILETO PULE & MOCARELA / Chicken Fillet & Mozzarella"><span class="price-badge">790 lek</span></div><div class="meta"><div class="title">FILETO PULE & MOCARELA / Chicken Fillet & Mozzarella</div><div class="desc">Rigatoni të Freskëta, Fileto Pule, Mocarela, Spinaq, Salcë Domate, Grana Padano <br>Fresh Rigatoni, Chicken Fillet, Mozzarella, Spinach, Tomato Sauce, Grana Padano</div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="Fotot/Pasta/Tagliatelle Karkalec & Kungull.jpeg" alt="KARKALEC & KUNGULL / Shrimp & Zucchini"><span class="price-badge">790 lek</span></div><div class="meta"><div class="title">KARKALEC & KUNGULL / Shrimp & Zucchini</div><div class="desc">Tagliatelle të Freskëta, Karkalec, Kungull, Pomodorini, Hudhër, Grana Padano <br>Fresh Tagliatelle, Shrimp, Zucchini, Cherry Tomato, Garlic, Grana Padano</div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="Fotot/Pasta/ravioli domate borzilok.jpg" alt="RAVIOLI DOMATE & BORZILOK / Tomato & Basil Ravioli"><span class="price-badge">750 lek</span></div><div class="meta"><div class="title">RAVIOLI DOMATE & BORZILOK / Tomato & Basil Ravioli</div><div class="desc">Ravioli të Freskëta, Salcë Domate, Domate, Borzilok, Grana Padano, Pana <br>Fresh Ravioli, Tomato Sauce, Tomato, Basil, Grana Padano, Heavy Cream</div></div></article>
+      </div>
+    </section>
+
+    <section class="category" id="risottos" data-label="Risottos">
+      <div class="head"><h2>Risottos</h2><div class="sub"></div></div>
+      <div class="grid">
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="KREM SPINAQI & PANCETË / Spinach Cream & Bacon"><span class="price-badge">780 lek</span></div><div class="meta"><div class="title">KREM SPINAQI & PANCETË / Spinach Cream & Bacon</div><div class="desc">Oriz Carnaroli, Pancetë, Spinaq, Stika Pishe, Gorgonzola, Krem Djathi, Grana Padano <br>Carnaroli Rice, Bacon, Spinach, Pine Nuts, Gorgonzola, Cream Cheese, Grana Padano</div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="FILETO PULE & PERIME / Chicken Fillet & Vegetable "><span class="price-badge">750 lek</span></div><div class="meta"><div class="title">FILETO PULE & PERIME / Chicken Fillet & Vegetable </div><div class="desc">Oriz Carnaroli, Fileto Pule, Spec i Kuq, Kungull, Karrotë, Kërpudhë, Misër, Grana Padano <br>Carnaroli Rice, Chicken Fillet, Red Pepper, Zucchini, Carrot, Mushroom, Corn, Grana Padano</div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="Fotot/Risottos/Tartuf & Kerpudhe.jpeg" alt="TARTUF & KËRPUDHË / Truffle & Mushroom "><span class="price-badge">780 lek</span></div><div class="meta"><div class="title">TARTUF & KËRPUDHË / Truffle & Mushroom </div><div class="desc">Oriz Carnaroli, Krem Tartufi, Kërpudhë, Pana, Grana Padano <br>Carnaroli Rice, Truffle Cream, Mushroom, Heavy Cream, Grana Padano</div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="KARKALEC & ASPARAG / Shrimp & Asparagus "><span class="price-badge">850 lek</span></div><div class="meta"><div class="title">KARKALEC & ASPARAG / Shrimp & Asparagus </div><div class="desc">Oriz Carnaroli, Karkalec, Asparag, Krem Tartufi, Grana Padano, Pana <br>Carnaroli Rice, Shrimp, Asparagus, Truffle Cream, Grana Padano, Heavy Cream</div></div></article>
+      </div>
+    </section>
+
+    <section class="category" id="chicken-filets" data-label="Chicken Filelets">
+      <div class="head"><h2>Chicken Fillets</h2><div class="sub"></div></div>
+      <div class="grid">
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="KËRPUDHA & SHAFRAN / Mushroom & Saffron"><span class="price-badge">850 lek</span></div><div class="meta"><div class="title">KËRPUDHA & SHAFRAN / Mushroom & Saffron</div><div class="desc">Fileto Pule, Kërpudhë, Spec i Kuq, Shafran, Pana, Grana Padano <br>Chicken Fillet, Mushroom, Red Pepper, Saffron, Heavy Cream, Grana Padano</div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="DEMI-GLACÉ"><span class="price-badge">850 lek</span></div><div class="meta"><div class="title">DEMI-GLACÉ</div><div class="desc">Fileto Pule, Salcë Demi-Glacé, Spinaq, Patate Baby <br>Chicken Fillet, Demi-Glace Sauce, Spinach, Baby Potato</div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="PURE KORROTE & PERIME / Carrot Puree & Vegetable"><span class="price-badge">850 lek</span></div><div class="meta"><div class="title">PURE KORROTE & PERIME / Carrot Puree & Vegetable</div><div class="desc">Fileto Pule, Karrotë, Asparag, Brokoli <br>Chicken Fillet, Carrot, Asparagus Broccoli</div></div></article>
+      </div>
+    </section>
+
+    <section class="category" id="pinsa" data-label="Pinsa">
+      <div class="head"><h2>Pinsa</h2><div class="sub"></div></div>
+      <div class="grid">
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="Fotot/Pinsa/Pinsa Tacchino.jpeg" alt="PROSHUTË GJELI / Tacchino"><span class="price-badge">850 lek</span></div><div class="meta"><div class="title">PROSHUTË GJELI / Tacchino</div><div class="desc">Proshutë Gjeli, Mocarela, Salcë Domate, Rigon <br>Turkey Ham, Mozzarella, Tomato Sauce, Oregano</div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="Fotot/Pinsa/Spicy Pinsa.jpeg" alt="PIKANTE / Spicy"><span class="price-badge">850 lek</span></div><div class="meta"><div class="title">PIKANTE / Spicy</div><div class="desc">Spianata Pikante, Mocarela, Salcë Domate, Rigon <br>Spianata Piccante, Mozzarella, Tomato Sauce, Oregano</div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="MARGARITA / Margherita"><span class="price-badge">800 lek</span></div><div class="meta"><div class="title">MARGARITA / Margherita</div><div class="desc">Salcë Domate, Mocarela, Borzilok, Vaj Ulliri <br>Tomato Sauce, Mozzarella, Basil, Olive Oil</div></div></article>
+      </div>
+    </section>
+
+    <section class="category" id="desserts" data-label="Desserts">
+      <div class="head"><h2>Desserts</h2><div class="sub"></div></div>
+      <div class="grid">
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="MORBIDA DI STELLE "><span class="price-badge">450 lek</span></div><div class="meta"><div class="title">MORBIDA DI STELLE </div><div class="desc">Krem Cokollate, Bazë Krokante Biskotash me Kakao, Dekor me Yje Sheqeri <br>Chocolate Cream, Crunchy Base Of Cocoa Biscuits, Decorated With Sugar Stars</div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="CROSTATA AI FRUTTI DI BOSCO "><span class="price-badge">450 lek</span></div><div class="meta"><div class="title">CROSTATA AI FRUTTI DI BOSCO </div><div class="desc">Krem Pasticerie, Fruta Pylli, Fruta të Thata Miks <br>Custard, Forest Fruits, Mix Dried Fruits</div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="TIRAMISU-ja JONE / Our Tiramisu "><span class="price-badge">500 lek</span></div><div class="meta"><div class="title">TIRAMISU-ja JONE / Our Tiramisu </div><div class="desc">Mascarpone, Vezë, Biskota Savoiardi, Kafe, Kakao <br>Mascarpone, Egg, Savoiardi Biscuits, Espresso, Cacao</div></div></article>
+      </div>
+    </section>
+
+    <section class="category" id="antipasts" data-label="Antipasts">
+      <div class="head"><h2>Appetizers</h2><div class="sub"></div></div>
+      <div class="grid">
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="Fotot/Appetizers/burger.jpg" alt="BURGER"><span class="price-badge">900 lek</span></div><div class="meta"><div class="title">BURGER</div><div class="desc">Qofte me Mish Black Angus, Djathë Cedar, Kastravec Turshi, Qepë e Karamelizuar, Domate, Sallatë Jeshile, Krem Djathi, Patate të Skuqura <br>Black Angus Meat Patty, Cheddar Cheese, Pickles, Caramelized Onion, Tomato, Lettuce, Cream Cheese, French Fries</div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="Fotot/Appetizers/Mini Burgers.jpeg" alt="MINI BURGERS / Mini Burgers "><span class="price-badge">750 lek</span></div><div class="meta"><div class="title">MINI BURGERS / Mini Burgers </div><div class="desc">Kotoleta Pule, Qepë e Karamelizuar, Kastravec Turshi, Salcë Cezar, Rrathë Qepe <br>Chicken Cutlet, Caramelized Onion, Pickle, Caesar Sauce, Onion Rings </div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="Fotot/Appetizers/Tacos pule.jpeg" alt="TACOS PULE / Chicken Tacos "><span class="price-badge">800 lek</span></div><div class="meta"><div class="title">TACOS PULE / Chicken Tacos </div><div class="desc">Fileto Pule, Spec i Kuq, Salcë Demi-Glacé, Salcë Cezar <br>Chicken Fillet, Red Pepper, Demi-Glacé Sauce, Caesar Sauce</div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="Fotot/Appetizers/Beef tacos.jpeg" alt="TAKOS MISH VICI / Beef Tacos "><span class="price-badge">950 lek</span></div><div class="meta"><div class="title">TAKOS MISH VICI / Beef Tacos </div><div class="desc">Mish Vici, Djathë Cheddar, Salcë Demi-Glacé, Spec Djegës, Majdanoz <br>Beef, Cheddar Cheese, Demi-Glacé Sauce, Chili Pepper, Parsley</div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="Fotot/Appetizers/Takos Karkalec.jpeg" alt="TAKOS KARKALEC / Shrimp Tacos "><span class="price-badge">800 lek</span></div><div class="meta"><div class="title">TAKOS KARKALEC / Shrimp Tacos </div><div class="desc">Karkalec, Krem Avokado, Pomodorini, Salcë Cezar, Majdanoz <br>Shrimp, Avocado Cream, Cherry Tomato, Caesar Sauce, Parsley</div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="PATATE TË SKUQURA / French Fries"><span class="price-badge">550 lek</span></div><div class="meta"><div class="title">PATATE TË SKUQURA / French Fries</div><div class="desc">Patate, Salcë Cesar, Salcë Sweet Chili, Grana Padano <br>Potato, Caesar Sauce, Sweet Chili Sauce, Grana Padano</div></div></article>
+        <article class="card">
+            <div class="meta">
+              <div class="title" style="text-align:center;">CROSTINI TRIO</div>
+            </div>
+
+            <!-- 1️⃣ Salmon & Capers -->
+            <div class="img-wrap">
+              <img loading="lazy" src="Fotot/Appetizers/Salmon&Kaperi.jpeg" alt="SALMON & KAPERI / Salmon & Capers">
+              <span class="price-badge">650 lek</span>
+            </div>
+            <div class="meta">
+              <div class="title">SALMON & KAPERI / Salmon & Capers</div>
+              <div class="desc">
+                Salmon, Kaperi, Kastravec, Krem Djathi<br>
+                Salmon, Capers, Cucumber, Cream Cheese
+              </div>
+            </div>
+
+            <!-- 2️⃣ Mozzarella & Cherry Tomato -->
+            <div class="img-wrap">
+              <img loading="lazy" src="Fotot/Appetizers/Mozzarella&Tomato.jpeg" alt="MOCARELA & POMODORINI / Mozzarella & Cherry Tomato">
+              <span class="price-badge">650 lek</span>
+            </div>
+            <div class="meta">
+              <div class="title">MOCARELA & POMODORINI / Mozzarella & Cherry Tomato</div>
+              <div class="desc">
+                Mocarela, Pomodorini, Borzilok, Aceto Balsamike Krem<br>
+                Mozzarella, Cherry Tomato, Basil, Balsamic Vinegar Cream
+              </div>
+            </div>
+
+            <!-- 3️⃣ Tomato & Avocado -->
+            <div class="img-wrap">
+              <img loading="lazy" src="Fotot/Appetizers/Tomato&Avocado.jpeg" alt="DOMATE & AVOKADO / Tomato & Avocado">
+              <span class="price-badge">650 lek</span>
+            </div>
+            <div class="meta">
+              <div class="title">DOMATE & AVOKADO / Tomato & Avocado</div>
+              <div class="desc">
+                Domate, Avokado, Krem Djathi<br>
+                Tomato, Avocado, Cream Cheese
+              </div>
+            </div>
+          </article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="DJATHË & PROSHUTË MIKS / Cheese & Ham Mix"><span class="price-badge">1500 lek</span></div><div class="meta"><div class="title">DJATHË & PROSHUTË MIKS / Cheese & Ham Mix</div><div class="desc">Caciotta Pikante, Pecorino Romano, Brie, Sallam me Tartuf, Proshutë Krudo, Sallam me Rozmarinë, Kastravec Turshi, Ullinj, Mjaltë, Arra, Shkopinj Buke, Taralli, Fruta <br>Caciotta Piccante, Pecorino Romano, Brie, Truffle Salami, Row Ham, Rosemary Salami, Pickles, Olives, Honey, Nuts, Grissini, Taralli, Fruits</div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="ANTIPASTA E SHTËPISË / Appetizer Of The House "><span class="price-badge">1650 lek</span></div><div class="meta"><div class="title">ANTIPASTA E SHTËPISË / Appetizer Of The House </div><div class="desc">Chicken Fingers, Salcice, Spring Rolls, Patate të Skuqura, Salcë Sweet Chili, Salcë Cezar <br>Chicken Fingers, Sausage, Spring Rolls, French Fries, Sweet Chili Sauce, Caesar Sauce</div></div></article>
+      </div>
+    </section>
+
+    <section class="category" id="sigaperitifs" data-label="sigaperitifs">
+      <div class="head"><h2>Signature Aperitifs</h2><div class="sub" style="text-align: right;"></div></div>
+      <div class="grid">
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="DORI'S GIN"><span class="price-badge">750 lek</span></div><div class="meta"><div class="title">DORI'S GIN</div><div class="desc">Gin, Tonic Water, Orange</div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="SHEGA"><span class="price-badge">750 lek</span></div><div class="meta"><div class="title">SHEGA</div><div class="desc">Pomegranate, Spumante</div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="PORNSTAR"><span class="price-badge">750 lek</span></div><div class="meta"><div class="title">PORNSTAR</div><div class="desc">Passion Fruit, Spumante</div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="WATERMELON SPRITZ"><span class="price-badge">750 lek</span></div><div class="meta"><div class="title">WATERMELON SPRITZ</div><div class="desc">Watermelon, Lime, Spumante</div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="VENICE"><span class="price-badge">750 lek</span></div><div class="meta"><div class="title">VENICE</div><div class="desc">Vermouth Rosso, Dry Vermouth, Elderflower, Angostura, Spumante</div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="COCO"><span class="price-badge">750 lek</span></div><div class="meta"><div class="title">COCO</div><div class="desc">Gin, Coconut Syrup, Lime</div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt=""><span class="price-badge">750 lek</span></div><div class="meta"><div class="title">CROQUE MADAME</div><div class="desc"></div></div></article>
+      </div>
+    </section>
+
+    <section class="category" id="aperitifs" data-label="aperitifs">
+      <div class="head"><h2>Aperitifs</h2><div class="sub" style="text-align: right;"></div></div>
+      <div class="grid">
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="APEROL SPRITZ"><span class="price-badge">700 lek</span></div><div class="meta"><div class="title">APEROL SPRITZ</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="HUGO"><span class="price-badge">700 lek</span></div><div class="meta"><div class="title">HUGO</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="MARTINI ROSSO"><span class="price-badge">700 lek</span></div><div class="meta"><div class="title">MARTINI ROSSO</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="CAMPARI SPRITZ"><span class="price-badge">700 lek</span></div><div class="meta"><div class="title">CAMPARI SPRITZ</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="LIMONCELLO SPRITZ"><span class="price-badge">700 lek</span></div><div class="meta"><div class="title">LIMONCELLO SPRITZ</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="BELLINI"><span class="price-badge">700 lek</span></div><div class="meta"><div class="title">BELLINI</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="MIMOSA"><span class="price-badge">700 lek</span></div><div class="meta"><div class="title">MIMOSA</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="FRENCH 75"><span class="price-badge">700 lek</span></div><div class="meta"><div class="title">FRENCH 75</div><div class="desc"></div></div></article>
+      </div>
+    </section>
+
+    <section class="category" id="sigcocktails" data-label="sigcocktails">
+      <div class="head"><h2>Signature Cocktails</h2><div class="sub" style="text-align: right;"></div></div>
+      <div class="grid">
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="OLD NOOR"><span class="price-badge">850 lek</span></div><div class="meta"><div class="title">OLD NOOR</div><div class="desc">Connamon Whiskey, Rum, Angostura Bitters</div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="SECRET"><span class="price-badge">850 lek</span></div><div class="meta"><div class="title">SECRET</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="ZHAO"><span class="price-badge">850 lek</span></div><div class="meta"><div class="title">ZHAO</div><div class="desc">Rum, Melon, Pineapple, Lemon</div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="MEDELLIN"><span class="price-badge">850 lek</span></div><div class="meta"><div class="title">MEDELLIN</div><div class="desc">Vodka, Vermouth, Passion Fruit Liqueur, Strawberry, Basil</div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="MAMA"><span class="price-badge">850 lek</span></div><div class="meta"><div class="title">MAMA</div><div class="desc">Vodka, Orange Liqueur, Strawberry, Ginger</div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="ROME"><span class="price-badge">850 lek</span></div><div class="meta"><div class="title">ROME</div><div class="desc">Gin, Italicus Liqueur, Basil</div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="PILIVESA"><span class="price-badge">850 lek</span></div><div class="meta"><div class="title">PILIVESA</div><div class="desc">Rum, Jagermeister, Elderflower Liqueur, Mint, Lemon</div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="ROSEMARY"><span class="price-badge">850 lek</span></div><div class="meta"><div class="title">ROSEMARY</div><div class="desc">Vodka, Prosecco, Simple Syrup, Lemon</div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="GUAPA"><span class="price-badge">850 lek</span></div><div class="meta"><div class="title">GUAPA</div><div class="desc">Vodka, Triple Sec, Simple Syrup, Pomegranate, Lime</div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="FLAMA"><span class="price-badge">850 lek</span></div><div class="meta"><div class="title">FLAMA</div><div class="desc">Tequila, Triple Sec, Orange, Tabasco, Chili Pepper</div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="PLIS"><span class="price-badge">850 lek</span></div><div class="meta"><div class="title">PLIS</div><div class="desc">Gin, Limoncello, Simple Syrup, Lime</div></div></article>
+      </div>
+    </section>
+
+    <section class="category" id="classcocktails" data-label="classcocktails">
+      <div class="head"><h2>Classic Cocktails</h2><div class="sub" style="text-align: right;"></div></div>
+      <div class="grid">
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="OLD FASHIONED"><span class="price-badge">800 lek</span></div><div class="meta"><div class="title">OLD FASHIONED</div><div class="desc">Bourbon, Angostura, Sugar</div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="MARGARITA"><span class="price-badge">800 lek</span></div><div class="meta"><div class="title">MARGARITA</div><div class="desc">Tequila, Orange Liqueur, Lime</div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="NEGRONI"><span class="price-badge">800 lek</span></div><div class="meta"><div class="title">NEGRONI</div><div class="desc">Gin, Red Vermouth, Campari</div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="GIN BASIL SMASH"><span class="price-badge">800 lek</span></div><div class="meta"><div class="title">GIN BASIL SMASH</div><div class="desc">Gin, Basil</div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="ESPRESSO MARTINI"><span class="price-badge">800 lek</span></div><div class="meta"><div class="title">ESPRESSO MARTINI</div><div class="desc">Vodka, Coffee Liqueur, Coffee, Sugar</div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="PORNSTAR MARTINI"><span class="price-badge">800 lek</span></div><div class="meta"><div class="title">PORNSTAR MARTINI</div><div class="desc">Vodka, Passion Fruit Liqueur, Vanilla, Lime</div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="CAIPIROSKA"><span class="price-badge">800 lek</span></div><div class="meta"><div class="title">CAIPIROSKA</div><div class="desc">Vodka, Sugar, Lime</div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="COSMOPOLITAN"><span class="price-badge">800 lek</span></div><div class="meta"><div class="title">COSMOPOLITAN</div><div class="desc">Vodka, Orange Liqueur, Cranberry, Lime</div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="MOSCOW MULE"><span class="price-badge">800 lek</span></div><div class="meta"><div class="title">MOSCOW MULE</div><div class="desc">Vodka, Ginger Beer, Lime, Mint</div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="MOJITO"><span class="price-badge">800 lek</span></div><div class="meta"><div class="title">MOJITO</div><div class="desc">White Rum, Simple Syrup, Lime, Mint</div></div></article>
+      </div>
+    </section>
+
+    <section class="category" id="winebyglass" data-label="winebyglass">
+      <div class="head">
+        <h2>Wine By Glass</h2>
+        <div class="sub" style="text-align: right;"></div>
+      </div>
+
+      <!-- WHITE WINES -->
+      <h3 class="subhead">White Wines</h3>
+      <div class="grid">
+
+        <article class="card">
+          <div class="img-wrap">
+            <img loading="lazy" src="" alt="CHARDONAY">
+            <span class="price-badge">450 lek</span>
+          </div>
+          <div class="meta">
+            <div class="title">CHARDONAY</div>
+            <div class="desc"></div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="img-wrap">
+            <img loading="lazy" src="" alt="LYHNID">
+            <span class="price-badge">500 lek</span>
+          </div>
+          <div class="meta">
+            <div class="title">LYHNID</div>
+            <div class="desc"></div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="img-wrap">
+            <img loading="lazy" src="" alt="PINOT GRIGIO">
+            <span class="price-badge">550 lek</span>
+          </div>
+          <div class="meta">
+            <div class="title">PINOT GRIGIO</div>
+            <div class="desc"></div>
+          </div>
+        </article>
+
+      </div>
+
+      <!-- RED WINES -->
+      <h3 class="subhead">Red Wines</h3>
+      <div class="grid">
+
+        <article class="card">
+          <div class="img-wrap">
+            <img loading="lazy" src="" alt="NERO D'AVOLA">
+            <span class="price-badge">450 lek</span>
+          </div>
+          <div class="meta">
+            <div class="title">NERO D'AVOLA</div>
+            <div class="desc"></div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="img-wrap">
+            <img loading="lazy" src="" alt="LYHNID">
+            <span class="price-badge">500 lek</span>
+          </div>
+          <div class="meta">
+            <div class="title">LYHNID</div>
+            <div class="desc"></div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="img-wrap">
+            <img loading="lazy" src="" alt="PRIMITIVO">
+            <span class="price-badge">550 lek</span>
+          </div>
+          <div class="meta">
+            <div class="title">PRIMITIVO</div>
+            <div class="desc"></div>
+          </div>
+        </article>
+        
+      </div>
+    </section>
+
+    <section class="category" id="bottledbeers" data-label="bottledbeers">
+      <div class="head"><h2>Bottled Beers</h2><div class="sub" style="text-align: right;"></div></div>
+      <div class="grid">
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="PEJA CHILL"><span class="price-badge">400 lek</span></div><div class="meta"><div class="title">PEJA CHILL</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="STELLA ARTOIS"><span class="price-badge">450 lek</span></div><div class="meta"><div class="title">STELLA ARTOIS</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="CARLSBERG"><span class="price-badge">450 lek</span></div><div class="meta"><div class="title">CARLSBERG</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="HEINEKEN"><span class="price-badge">450 lek</span></div><div class="meta"><div class="title">HEINEKEN</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="LEFFE"><span class="price-badge">600 lek</span></div><div class="meta"><div class="title">LEFFE</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="CORONA"><span class="price-badge">550 lek</span></div><div class="meta"><div class="title">CORONA</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="PAULANER"><span class="price-badge">600 lek</span></div><div class="meta"><div class="title">PAULANER</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="ERDINGER"><span class="price-badge">600 lek</span></div><div class="meta"><div class="title">ERDINGER</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="NOAM"><span class="price-badge">600 lek</span></div><div class="meta"><div class="title">NOAM</div><div class="desc"></div></div></article>
+      </div>
+    </section>
+
+    <section class="category" id="draftbeer" data-label="draftbeer">
+      <div class="head"><h2>Draft Beer</h2><div class="sub" style="text-align: right;"></div></div>
+      <div class="grid">
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="ESTRELLA DAMM"><span class="price-badge">450 lek</span></div><div class="meta"><div class="title">ESTRELLA DAMM</div><div class="desc">400 ML</div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="ESTRELLA DAMM"><span class="price-badge">2700 lek</span></div><div class="meta"><div class="title">ESTRELLA DAMM</div><div class="desc">3 L</div></div></article>
+      </div>
+    </section>
+
+    <section class="category" id="raki" data-label="raki">
+      <div class="head"><h2>Raki</h2><div class="sub" style="text-align: right;"></div></div>
+      <div class="grid">
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="DARDHE / MANAFERRE / FTOI "><span class="price-badge">350 lek</span></div><div class="meta"><div class="title">DARDHE / MANAFERRE / FTOI</div><div class="desc">Pear / Blackberry / Quince</div></div></article>
+      </div>
+    </section>
+
+    <section class="category" id="gin" data-label="gin">
+      <div class="head"><h2>Gin</h2><div class="sub" style="text-align: right;"></div></div>
+      <div class="grid">
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="MALFY"><span class="price-badge">800 lek</span></div><div class="meta"><div class="title">MALFY</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="HENDRIC'S"><span class="price-badge">950 lek</span></div><div class="meta"><div class="title">HENDRIC'S</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="HENDRIC'S AMAZONIA"><span class="price-badge">1300 lek</span></div><div class="meta"><div class="title">HENDRIC'S AMAZONIA</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="MARE"><span class="price-badge">1100 lek</span></div><div class="meta"><div class="title">MARE</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="KI NO BI"><span class="price-badge">1600 lek</span></div><div class="meta"><div class="title">KI NO BI</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="MONKEY 47"><span class="price-badge">1700 lek</span></div><div class="meta"><div class="title">MONKEY 47</div><div class="desc"></div></div></article>
+      </div>
+    </section>
+
+    <section class="category" id="vodka" data-label="vodka">
+      <div class="head"><h2>Vodka</h2><div class="sub" style="text-align: right;"></div></div>
+      <div class="grid">
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="GREY GOOSE"><span class="price-badge">900 lek</span></div><div class="meta"><div class="title">GREY GOOSE</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="BELVEDERE"><span class="price-badge">900 lek</span></div><div class="meta"><div class="title">BELVEDERE</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="BELUGA"><span class="price-badge">900 lek</span></div><div class="meta"><div class="title">BELUGA</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="ABSOLUTE ELYX"><span class="price-badge">1200 lek</span></div><div class="meta"><div class="title">ABSOLUTE ELYX</div><div class="desc"></div></div></article>
+      </div>
+    </section>
+
+    <section class="category" id="rum" data-label="rum">
+      <div class="head"><h2>Rum</h2><div class="sub" style="text-align: right;"></div></div>
+      <div class="grid">
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="BACARDI 8"><span class="price-badge">800 lek</span></div><div class="meta"><div class="title">BACARDI 8</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="ANNIVERSARIO"><span class="price-badge">700 lek</span></div><div class="meta"><div class="title">ANNIVERSARIO</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="DIPLOMATICO"><span class="price-badge">1000 lek</span></div><div class="meta"><div class="title">DIPLOMATICO</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="DICTATOR 12"><span class="price-badge">1200 lek</span></div><div class="meta"><div class="title">DICTATOR 12</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="ZACAPA"><span class="price-badge">1500 lek</span></div><div class="meta"><div class="title">ZACAPA</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="HAVANA CLUB MAESTRO"><span class="price-badge">1600 lek</span></div><div class="meta"><div class="title">HAVANA CLUB MAESTRO</div><div class="desc"></div></div></article>
+      </div>
+    </section>
+
+    <section class="category" id="whiskey" data-label="whiskey">
+      <div class="head"><h2>Whiskey</h2><div class="sub" style="text-align: right;"></div></div>
+      <div class="grid">
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="GRENFIDDICH 12"><span class="price-badge">800 lek</span></div><div class="meta"><div class="title">GRENFIDDICH 12</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="CARDHU"><span class="price-badge">950 lek</span></div><div class="meta"><div class="title">CARDHU</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="TALISKER"><span class="price-badge">1100 lek</span></div><div class="meta"><div class="title">TALISKER</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="LAGAVULIN"><span class="price-badge">1150 lek</span></div><div class="meta"><div class="title">LAGAVULIN</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="OBAN"><span class="price-badge">1300 lek</span></div><div class="meta"><div class="title">OBAN</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="CHIVAS MIZUNARA"><span class="price-badge">1300 lek</span></div><div class="meta"><div class="title">CHIVAS MIZUNARA</div><div class="desc"></div></div></article>
+      </div>
+    </section>
+
+    <section class="category" id="amaro" data-label="amaro">
+      <div class="head"><h2>Amaro</h2><div class="sub" style="text-align: right;"></div></div>
+      <div class="grid">
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="DEL CAPO"><span class="price-badge">450 lek</span></div><div class="meta"><div class="title">DEL CAPO</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="MONTENEGRO"><span class="price-badge">450 lek</span></div><div class="meta"><div class="title">MONTENEGRO</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="DISARONNO"><span class="price-badge">450 lek</span></div><div class="meta"><div class="title">DISARONNO</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="RAMAZZOTTI"><span class="price-badge">450 lek</span></div><div class="meta"><div class="title">RAMAZZOTTI</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="FERNET BRANCA"><span class="price-badge">450 lek</span></div><div class="meta"><div class="title">FERNET BRANCA</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="UNICUM"><span class="price-badge">450 lek</span></div><div class="meta"><div class="title">UNICUN</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="JAGERMEISTER"><span class="price-badge">450 lek</span></div><div class="meta"><div class="title">JAGERMEISTER</div><div class="desc"></div></div></article>
+      </div>
+    </section>
+
+    <section class="category" id="cognac" data-label="cognac">
+      <div class="head"><h2>Cognac</h2><div class="sub" style="text-align: right;"></div></div>
+      <div class="grid">
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="HENNESSY"><span class="price-badge">800 lek</span></div><div class="meta"><div class="title">HENNESSY</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="METAXA 12"><span class="price-badge">800 lek</span></div><div class="meta"><div class="title">METAXA 12</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="METAXA 7"><span class="price-badge">500 lek</span></div><div class="meta"><div class="title">METAXA 7</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="METAXA 5"><span class="price-badge">450 lek</span></div><div class="meta"><div class="title">METAXA 5</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="COURVOISIER"><span class="price-badge">800 lek</span></div><div class="meta"><div class="title">COURVOISIER</div><div class="desc"></div></div></article>
+      </div>
+    </section>
+
+    <section class="category" id="hotdrinks" data-label="hotdrinks">
+      <div class="head"><h2>Hot Drinks</h2><div class="sub" style="text-align: right;"></div></div>
+      <div class="grid">
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="ESPRESSO"><span class="price-badge">130 lek</span></div><div class="meta"><div class="title">ESPRESSO</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="MACCHIATO"><span class="price-badge">130 lek</span></div><div class="meta"><div class="title">MACCHIATO</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="AMERICANO"><span class="price-badge">220 lek</span></div><div class="meta"><div class="title">AMERICANO</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="DECAFFEINATO"><span class="price-badge">190 lek</span></div><div class="meta"><div class="title">DECAFFEINATO</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="CAFFE LATTE"><span class="price-badge">260 lek</span></div><div class="meta"><div class="title">CAFFE LATTE</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="CAPPUCCINO"><span class="price-badge">220 lek</span></div><div class="meta"><div class="title">CAPPUCCINO</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="CORRETTO"><span class="price-badge">300 lek</span></div><div class="meta"><div class="title">CORRETTO</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="DOUBLE ESPRESSO"><span class="price-badge">250 lek</span></div><div class="meta"><div class="title">DOUBLE ESPRESSO</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="CAPPUCCINO DECAFFEINATO"><span class="price-badge">280 lek</span></div><div class="meta"><div class="title">CAPPUCCINO DECAFFEINATO</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="CACAO"><span class="price-badge">280 lek</span></div><div class="meta"><div class="title">CACAO</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="CHOCOLATE"><span class="price-badge">360 lek</span></div><div class="meta"><div class="title">CHOCOLATE</div><div class="desc">Strawberry / Hazelnuts / Banana</div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="ORGANIC TEA"><span class="price-badge">280 lek</span></div><div class="meta"><div class="title">ORGANIC TEA</div><div class="desc"></div></div></article>
+      </div>
+    </section>
+
+    <section class="category" id="colddrinks" data-label="colddrinks">
+      <div class="head"><h2>Cold Drinks</h2><div class="sub" style="text-align: right;"></div></div>
+      <div class="grid">
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="FREDDO MACCHIATO"><span class="price-badge">260 lek</span></div><div class="meta"><div class="title">FREDDO MACCHIATO</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="FREDDO ESPRESSO"><span class="price-badge">300 lek</span></div><div class="meta"><div class="title">FREDDO ESPRESSO</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="FREDDO CAPPUCCINO"><span class="price-badge">350 lek</span></div><div class="meta"><div class="title">FREDDO CAPPUCCINO</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="FRAPPE"><span class="price-badge">350 lek</span></div><div class="meta"><div class="title">FRAPPE</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="SOFT DRINKS"><span class="price-badge">300 lek</span></div><div class="meta"><div class="title">SOFT DRINKS</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="RED BULL"><span class="price-badge">550 lek</span></div><div class="meta"><div class="title">RED BULL</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="ROSE LEMONADE"><span class="price-badge">550 lek</span></div><div class="meta"><div class="title">ROSE LEMONADE</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="GINGER BEER"><span class="price-badge">550 lek</span></div><div class="meta"><div class="title">GINGER BEER</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="FENTIMANS TONIC"><span class="price-badge">450 lek</span></div><div class="meta"><div class="title">FENTIMANS TONIC</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="SAN PELLEGRINO"><span class="price-badge">350 lek</span></div><div class="meta"><div class="title">SAN PELLEGRINO</div><div class="desc">750 ML</div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="PANNA"><span class="price-badge">350 lek</span></div><div class="meta"><div class="title">PANNA</div><div class="desc">750 ML</div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="STILL / SPARKLING WATER"><span class="price-badge">130 lek</span></div><div class="meta"><div class="title">STILL / SPARKLING WATER</div><div class="desc"></div></div></article>
+      </div>
+    </section>
+
+    <section class="category" id="juicessmoothies" data-label="juicessmoothies">
+      <div class="head"><h2>Juices & Smoothies</h2><div class="sub" style="text-align: right;"></div></div>
+      <div class="grid">
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="GINGER APPLE CUCUMBER"><span class="price-badge">400 lek</span></div><div class="meta"><div class="title">GINGER APPLE CUCUMBER</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="BEETROOT CARROT APPLE"><span class="price-badge">400 lek</span></div><div class="meta"><div class="title">BEETROOT CARROT APPLE</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="TROPICAL SMOOTHIE"><span class="price-badge">600 lek</span></div><div class="meta"><div class="title">TROPICAL SMOOTHIE</div><div class="desc"></div></div></article>
+      </div>
+    </section>
+
+  </div>
+
+  <script>
+    // Utilities
+    const $=(s,el=document)=>el.querySelector(s);
+    const $$=(s,el=document)=>[...el.querySelectorAll(s)];
+
+    function syncNavHeightVar(){
+      const navbar=$('#navbar');
+      if(!navbar)return;
+      const h=Math.ceil(navbar.getBoundingClientRect().height);
+      document.documentElement.style.setProperty('--nav-h',h+'px');
+    }
+
+    function setupSmoothScroll(){
+      // Nav tabs smooth scroll
+      $('#catList').addEventListener('click',e=>{
+        const link=e.target.closest('a[href^="#"]');
+        if(!link)return;
+        e.preventDefault();
+        const id=link.getAttribute('href');
+        const target=document.querySelector(id);
+        if(target){target.scrollIntoView({behavior:'smooth',block:'start'});}        
+      });
+      // Brand scroll to top
+      const brand=$('.nav-brand');
+      if(brand){brand.addEventListener('click',e=>{e.preventDefault();window.scrollTo({top:0,behavior:'smooth'});});}
+    }
+
+    function setupScrollSpy(){
+      const sections=$$('.category');
+      const links=$$('#catList a');
+
+      const activate=id=>{
+        links.forEach(a=>{
+          const on=a.getAttribute('href')==='#'+id;
+          a.classList.toggle('active',on);
+          if(on)a.setAttribute('aria-current','true'); else a.removeAttribute('aria-current');
+        });
+        // Keep active tab in view for long menus
+        const activeLink=[...links].find(a=>a.classList.contains('active'));
+        const scroller=$('#catScroll');
+        if(activeLink&&scroller){
+          const l=activeLink.getBoundingClientRect();
+          const s=scroller.getBoundingClientRect();
+          if(l.left < s.left || l.right > s.right){
+            scroller.scrollBy({left:(l.left < s.left) ? (l.left - s.left - 16) : (l.right - s.right + 16), behavior:'smooth'});
+          }
+        }
+      };
+
+      // IntersectionObserver (primary)
+      const observer=new IntersectionObserver(entries=>{
+        entries.forEach(entry=>{ if(entry.isIntersecting) activate(entry.target.id); });
+      },{
+        root:null,
+        threshold:0.35, // a bit earlier than halfway for tall sections
+        rootMargin:`-${parseInt(getComputedStyle(document.documentElement).getPropertyValue('--nav-h'))+16}px 0px -60% 0px`
+      });
+      sections.forEach(sec=>observer.observe(sec));
+
+      // Fallback: on scroll, choose the nearest section to the top
+      let ticking=false;
+      const onScroll=()=>{
+        if(ticking) return; ticking=true;
+        requestAnimationFrame(()=>{
+          const navH=parseInt(getComputedStyle(document.documentElement).getPropertyValue('--nav-h'))||0;
+          const y=window.scrollY + navH + 48;
+          let currentId=sections[0]?.id;
+          for(const sec of sections){ if(sec.offsetTop <= y) currentId=sec.id; else break; }
+          if(currentId) activate(currentId);
+          ticking=false;
+        });
+      };
+      window.addEventListener('scroll', onScroll, {passive:true});
+      // Run once to set initial state
+      onScroll();
+    }
+
+    // Basic sanity tests (console)
+    function runTests(){
+      const nav=$('#catList');
+      console.assert(!!nav,'Nav list exists');
+      const links=[...nav.querySelectorAll('a')];
+      console.assert(links.length===10,'Expected 10 nav items');
+      links.forEach(a=>{ const id=a.getAttribute('href'); const t=document.querySelector(id); console.assert(!!t, `Target exists for ${a.textContent}`); });
+      console.assert(typeof IntersectionObserver !== 'undefined','IntersectionObserver supported');
+      console.log('%cScroll‑spy ready','padding:2px 6px;border-radius:6px;background:#10b981;color:#fff');
+    }
+
+    // Init
+    window.addEventListener('load',()=>{syncNavHeightVar();setupSmoothScroll();setupScrollSpy();runTests();});
+    window.addEventListener('resize',syncNavHeightVar);
+  </script>
+</body>
+</html>
