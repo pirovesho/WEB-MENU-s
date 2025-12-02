@@ -6,6 +6,9 @@
 <title>Illyria - Hotel & Restorant</title>
 <link rel="icon" type="image/png" href="../images/illyria logo.png">
 <style>
+/* =========================
+   GLOBAL RESET & BASE
+========================= */
 * {
   margin: 0;
   padding: 0;
@@ -18,7 +21,10 @@ body {
   color: #3a3a3a;
 }
 
-a { text-decoration: none; }
+a {
+  text-decoration: none;
+}
+
 button {
   border: none;
   background-color: #8b6f47;
@@ -29,58 +35,108 @@ button {
   border-radius: 6px;
   transition: 0.3s;
 }
-button:hover { background-color: #6d5535; }
 
-/* HERO SECTION */
+button:hover {
+  background-color: #6d5535;
+}
+
+/* =========================
+   HERO SECTION
+========================= */
 .hero {
-  position: relative;
-  width: 100%;
-  min-height: 100vh;
   background: url('../images/main/main.jpeg') center/cover no-repeat;
+  width: 100%;
+  padding: 50px 20px;
   display: flex;
-  justify-content: flex-end;
+  justify-content: center;
+}
+
+.hero-container {
+  display: flex;
+  flex-wrap: wrap; /* elementet shkëputen kur nuk ka hapësirë */
+  gap: 20px;
+  width: 100%;
+  max-width: 1200px;
   align-items: flex-start;
-  padding: 30px;
+}
+
+/* LEFT BLUR */
+.left-blur {
+  flex: 1 1 200px;
+  min-width: 150px;
+  background: rgba(255,255,255,0.25);
+  backdrop-filter: blur(10px);
+  padding: 15px;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.vertical-name {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #e9e2d7;
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.vertical-name span {
+  display: block;
+  line-height: 1.2;
+}
+
+.social-icons {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.social-icons a img {
+  width: 30px;
+  height: 30px;
+  filter: brightness(0) invert(1);
+  transition: 0.3s;
+}
+
+.social-icons a img:hover {
+  transform: scale(1.1);
 }
 
 /* HERO TEXT */
 .hero-text {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  padding: 15px 25px;
-  font-size: 2rem;
-  font-weight: bold;
-  color: #fff;
-  text-align: center;
-  border-radius: 12px;
+  flex: 2 1 300px;
+  min-width: 250px;
   background: rgba(0,0,0,0.25);
-  backdrop-filter: blur(6px);
+  color: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  text-align: center;
   box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-  max-width: 90%;
 }
 
 /* TOP NAVBAR */
 .top-navbar {
+  flex: 1 1 100%;
   display: flex;
+  justify-content: center;
   gap: 20px;
-  position: absolute;
-  top: 20px;
-  right: 20px;
   background: rgba(0,0,0,0.35);
-  padding: 10px 15px;
+  padding: 10px;
   border-radius: 12px;
-  flex-wrap: wrap;
-  z-index: 10;
+  margin-top: 10px;
 }
+
 .top-navbar a {
   color: #f5f0e6;
   font-weight: bold;
-  font-size: 1rem;
+  font-size: 1.1rem;
   position: relative;
   transition: 0.3s;
 }
+
 .top-navbar a::after {
   content: '';
   position: absolute;
@@ -91,86 +147,117 @@ button:hover { background-color: #6d5535; }
   background: #f5f0e6;
   transition: 0.3s;
 }
+
 .top-navbar a.active::after,
-.top-navbar a:hover::after { width: 100%; }
-
-/* LEFT BLUR */
-.left-blur {
-  position: absolute;
-  top: 20px;
-  left: 20px;
-  backdrop-filter: blur(10px);
-  background: rgba(255,255,255,0.25);
-  padding: 15px;
-  border-radius: 12px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  height: calc(100vh - 40px);
-  align-items: center;
+.top-navbar a:hover::after {
+  width: 100%;
 }
 
-/* VERTICAL NAME */
-.vertical-name {
-  font-size: 2rem;
-  font-weight: bold;
-  color: #e9e2d7;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-.vertical-name span { line-height: 1.2; }
-
-/* SOCIAL ICONS */
-.social-icons {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-.social-icons img { width: 30px; height: 30px; filter: brightness(0) invert(1); transition: 0.3s; }
-.social-icons img:hover { transform: scale(1.1); }
-
-/* CONTENT SECTIONS */
+/* =========================
+   CONTENT SECTIONS
+========================= */
 .content-section {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: center;
   padding: 80px 10%;
   gap: 40px;
-  flex-wrap: wrap;
 }
-.content-section:nth-child(even) { flex-direction: row-reverse; }
 
-.content-section img,
+.content-section:nth-child(even) {
+  flex-direction: row-reverse;
+}
+
+.content-section img, 
 .content-section video {
-  width: 100%;
-  max-width: 500px;
-  height: auto;
+  flex: 1 1 400px;
+  max-width: 100%;
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 }
 
 .section-text {
-  flex: 1;
-  min-width: 250px;
+  flex: 1 1 400px;
 }
-.section-text h2 { font-size: 2rem; margin-bottom: 15px; color: #8b6f47; }
-.section-text p { font-size: 1rem; line-height: 1.5rem; margin-bottom: 20px; }
 
-/* FOOTER */
+.section-text h2 {
+  font-size: 2rem;
+  margin-bottom: 15px;
+  color: #8b6f47;
+}
+
+.section-text p {
+  font-size: 1.1rem;
+  line-height: 1.6rem;
+  margin-bottom: 20px;
+}
+
+.section-text button {
+  background-color: #8b6f47;
+  color: white;
+  padding: 12px 25px;
+  border-radius: 8px;
+  font-size: 1rem;
+  margin-top: 20px;
+  transition: 0.3s;
+}
+
+.section-text button:hover {
+  background-color: #6d5535;
+  transform: translateY(-3px);
+}
+
+/* Alternate section backgrounds */
+#restaurant { background: #F3E8D4; }
+#rooms { background: #e6d9c4; }
+#about { background: #f1e9db; }
+
+#restaurant, #rooms, #about {
+  border-radius: 20px;
+  padding: 60px 10%;
+  margin: 40px 0;
+  box-shadow: 0 12px 25px rgba(0,0,0,0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+#restaurant:hover, #rooms:hover, #about:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+}
+
+/* =========================
+   FOOTER
+========================= */
 footer {
   background: #2e2a25;
   color: white;
-  padding: 40px 20px;
+  padding: 50px 20px;
   display: flex;
   flex-wrap: wrap;
-  gap: 20px;
+  gap: 40px;
+  justify-content: space-between;
 }
-.footer-section { flex: 1 1 250px; }
-.footer-section h3 { margin-bottom: 15px; font-size: 1.2rem; }
-iframe { width: 100%; height: 250px; border-radius: 8px; border: none; }
 
-/* LANGUAGE SELECTOR */
+.footer-section {
+  flex: 1 1 250px;
+}
+
+.footer-section h3 {
+  margin-bottom: 15px;
+  font-size: 1.2rem;
+}
+
+iframe {
+  width: 100%;
+  height: 250px;
+  border: none;
+  border-radius: 8px;
+}
+
+/* =========================
+   LANGUAGE SELECTOR
+========================= */
 .language-selector {
   position: fixed;
   bottom: 20px;
@@ -184,33 +271,45 @@ iframe { width: 100%; height: 250px; border-radius: 8px; border: none; }
   gap: 10px;
   z-index: 9999;
 }
-.language-selector img {
-  height: 45px; width: 45px; border-radius: 50%;
-  object-fit: cover; cursor: pointer; transition: 0.3s;
-}
-.language-selector img:hover { transform: scale(1.1); }
 
-/* =======================
-  RESPONSIVE MEDIA QUERIES
+.language-selector img {
+  height: 45px;
+  width: 45px;
+  cursor: pointer;
+  border-radius: 50%;
+  object-fit: cover;
+  transition: transform 0.3s;
+  border: 1px solid rgb(200, 192, 192);
+}
+
+.language-selector img:hover {
+  transform: scale(1.1);
+}
+
+/* =========================
+   RESPONSIVE MEDIA QUERIES
 ========================= */
 @media (max-width: 1024px) {
-  .hero-text { font-size: 1.6rem; padding: 12px 20px; }
-  .top-navbar { gap: 10px; padding: 8px 12px; top: 10px; right: 10px; font-size: 0.9rem; }
-  .left-blur { padding: 12px; height: auto; top: 10px; left: 10px; }
+  .content-section {
+    flex-direction: column;
+  }
+
+  .section-text, .content-section img, .content-section video {
+    flex: 1 1 100%;
+  }
 }
 
 @media (max-width: 768px) {
-  .content-section { flex-direction: column; padding: 60px 5%; gap: 30px; }
-  .section-text { text-align: center; }
-  .hero-text { font-size: 1.2rem; padding: 10px 15px; }
-  .vertical-name { font-size: 1.8rem; flex-direction: row; gap: 5px; }
-}
+  .hero-container {
+    flex-direction: column;
+    align-items: center;
+  }
 
-@media (max-width: 480px) {
-  .hero-text { font-size: 1rem; padding: 8px 12px; }
-  .top-navbar { flex-direction: column; top: 5px; right: 5px; }
-  .vertical-name { font-size: 1.5rem; }
-  button { padding: 8px 15px; font-size: 0.9rem; }
+  .left-blur, .hero-text, .top-navbar {
+    flex: 1 1 100%;
+    max-width: 95%;
+    margin-bottom: 15px;
+  }
 }
 </style>
 </head>
