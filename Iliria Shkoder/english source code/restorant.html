@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Illyria - Restaurant</title>
+  <link rel="icon" type="image/png" href="../images/illyria logo.png">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Georgia", serif;
+    }
+
+    body {
+      background: #f8f4ef;
+      color: #3a3a3a;
+    }
+
+    a {
+      text-decoration: none;
+    }
+
+    button {
+      border: none;
+      background-color: #8b6f47;
+      color: white;
+      padding: 10px 20px;
+      cursor: pointer;
+      font-size: 1rem;
+      border-radius: 6px;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background-color: #6d5535;
+    }
+
+    /* HERO SECTION */
+    .hero {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      background-image: url('../images/restaurant/main.jpeg');
+      background-size: cover;
+      background-position: center;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 30px;
+    }
+
+    /* NAVBAR */
+    .top-navbar {
+      display: flex;
+      gap: 30px;
+      position: absolute; /* same as main page */
+      top: 30px;
+      right: 30px;
+      background: rgba(0, 0, 0, 0.3); /* subtle semi-transparent background */
+      padding: 10px 20px;
+      border-radius: 12px;
+    }
+
+    .top-navbar a {
+      color: #f5f0e6;
+      font-weight: bold;
+      font-size: 1.1rem;
+      position: relative;
+      transition: 0.3s;
+    }
+
+    .top-navbar a::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      width: 0%;
+      height: 2px;
+      background: #f5f0e6;
+      transition: 0.3s;
+    }
+
+    .top-navbar a.active::after,
+    .top-navbar a:hover::after {
+      width: 100%;
+    }
+
+    /* HERO TEXT */
+    .hero-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      display: inline-block;
+      width: auto;
+      padding: 20px 30px;
+      font-size: 2rem;
+      font-weight: bold;
+      color: #fff;
+      text-align: center;
+      border-radius: 12px;
+      background: rgba(0, 0, 0, 0.25);
+      -webkit-backdrop-filter: blur(6px);
+      backdrop-filter: blur(6px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+
+    /* CONTENT SECTIONS */
+    .content-section {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 100px 10%;
+      gap: 60px;
+      flex-wrap: wrap;
+      margin: 50px 0; 
+      background-color: #e6d9c4;
+    }
+
+    .content-section:nth-child(even) {
+      flex-direction: row-reverse;
+    }
+
+    .content-section img, .content-section video {
+      width: 50%;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+
+    .section-text {
+      width: 45%;
+    }
+
+    .section-text h2 {
+      font-size: 2.3rem;
+      margin-bottom: 15px;
+      color: #4b4237;
+    }
+
+    .section-text p {
+      font-size: 1.1rem;
+      line-height: 1.6rem;
+      margin-bottom: 20px;
+    }
+
+    .section-text button {
+      background-color: #8b6f47;
+      color: white;
+      padding: 12px 25px;
+      border-radius: 8px;
+      font-size: 1rem;
+      margin-top: 20px;
+      transition: 0.3s;
+    }
+
+    .section-text button:hover {
+      background-color: #6d5535;
+      transform: translateY(-3px);
+    }
+
+    /* FOOTER */
+    footer {
+      background: #2e2a25;
+      color: white;
+      padding: 50px;
+      margin-top: 50px;
+      display: flex;
+      justify-content: space-between;
+      gap: 40px;
+    }
+
+    .footer-section {
+      width: 33%;
+    }
+
+    .footer-section h3 {
+      margin-bottom: 15px;
+      font-size: 1.4rem;
+    }
+
+    iframe {
+      width: 100%;
+      height: 250px;
+      border: none;
+      border-radius: 8px;
+    }
+
+    /* LEFT BLUR SECTION */
+    .left-blur {
+      position: absolute;
+      top: 30px;
+      left: 30px;
+      backdrop-filter: blur(10px);          /* blurs background behind overlay */
+      background: rgba(255, 255, 255, 0.137);   /* semi-transparent white */
+      padding: 20px;
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: calc(100vh - 60px);          /* full height minus top/bottom margin */
+      align-items: center;
+    }
+
+    /* Vertical name inside overlay */
+    .vertical-name {
+      font-size: 2.5rem;
+      font-weight: bold;
+      color: #c6bdad;
+      margin-bottom: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .vertical-name span {
+      display: block;
+      line-height: 1.2;
+    }
+
+    /* Social icons below vertical name */
+    .social-icons {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .social-icons a img {
+      width: 30px;
+      height: 30px;
+      filter: brightness(0) invert(1); /* white icons */
+      transition: 0.3s;
+    }
+
+    .social-icons a img:hover {
+      transform: scale(1.1);
+    }
+
+    /* PHILOSOPHY SECTION */
+    .team-section {
+      text-align: center;
+      padding: 80px 10%;
+      background: #f0ebe2;
+      border-radius: 20px;
+      margin: 40px 0;
+    }
+
+    .team-section h2 {
+      font-size: 2.5rem;
+      color: #8b6f47;
+      margin-bottom: 20px;
+    }
+
+    .team-section p {
+      font-size: 1.1rem;
+      line-height: 1.6;
+      color: #3a3a3a;
+      max-width: 800px;
+      margin: 0 auto 40px auto;
+    }
+
+    /* OPTIONAL: Different heights for staircase effect */
+    .member.short img { height: 250px; }
+    .member.medium img { height: 350px; }
+    .member.tall img { height: 450px; }
+
+    /* RESPONSIVE FOR SMALL SCREENS */
+    @media (max-width: 900px) {
+      .team-members {
+        flex-direction: column;
+        align-items: center; /* stack vertically on mobile */
+      }
+
+      .member {
+        width: 70%; /* scale down images */
+      }
+    }
+
+  /* Scrolling container */
+.scrolling-gallery {
+  overflow: hidden;          /* hide overflowing images */
+  width: 100%;
+  margin-top: 30px;
+}
+
+/* Inner scrolling content */
+.scrolling-inner {
+  display: inline-flex;      /* horizontal layout without wrapping */
+  gap: 20px;
+  animation: scroll-left 40s linear infinite;
+}
+
+/* Member images */
+.scrolling-inner .member {
+  flex: 0 0 auto;           /* do not shrink, width based on content */
+}
+
+.scrolling-inner .member img {
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  height: 450px;            /* uniform height */
+  width: auto;              /* maintain aspect ratio */
+  display: block;
+}
+
+/* Keyframes for smooth left scroll */
+@keyframes scroll-left {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%); /* adjust to half because we will duplicate images */
+  }
+}
+
+/* LANGUAGE SELECTOR */
+.language-selector {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  backdrop-filter: blur(8px);
+  background: rgba(255, 255, 255, 0.2);
+  padding: 6px;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 9999; /* above other content */
+}
+
+.language-selector img {
+  height: 45px;     /* circle size */
+  width: 45px;      /* must match height */
+  cursor: pointer;
+  border-radius: 50%; /* makes the image a perfect circle */
+  object-fit: cover;  /* ensures the flag fills the circle */
+  transition: transform 0.3s;
+  border: 1px solid rgb(200, 192, 192); /* optional small border for style */
+}
+
+.language-selector img:hover {
+  transform: scale(1.1);
+}
+
+h4, h2{
+      font-weight: normal;
+      color: #fbf4e8;
+    }
+
+  </style>
+</head>
+<body>
+
+  <!-- HERO -->
+  <section class="hero">
+    <!-- LEFT TRANSPARENT OVERLAY -->
+    
+    <div class="left-blur">
+      <div class="vertical-name">
+        <span>I</span>
+        <span>L</span>
+        <span>L</span>
+        <span>Y</span>
+        <span>R</span>
+        <span>I</span>
+        <span>A</span>
+      </div>
+      <div class="social-icons">
+        <a href="https://www.tiktok.com/@restorantillyriashkoder" target="_blank"><img src="https://img.icons8.com/ios_filled/200/FFFFFF/tiktok.png" alt="Tik-Tok" /></a>
+        <a href="https://www.facebook.com/BarRestorantIllyriaShkoder/?locale=sq_AL" target="_blank"><img src="https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/facebook-app-round-white-icon.png" alt="Facebook" /></a>
+        <a href="https://www.instagram.com/barrestorantillyriashkoder/" target="_blank"><img src="https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/instagram-white-icon.png" alt="Instagram" /></a>
+        <a href="https://www.booking.com/hotel/al/iliria-shkodra.html?aid=318615&label=New_English_EN_AL_27034601065-3G7RPrQQlfG_8FxYh5pXiAS637942140623%3Apl%3Ata%3Ap1%3Ap2%3Aac%3Aap%3Aneg%3Afi%3Atidsa-64415224945%3Alp9069992%3Ali%3Adec%3Adm%3Aag27034601065%3Acmp400850185&sid=362a151401e001d28d4557594e734670&dest_id=-108175&dest_type=city&dist=0&group_adults=4&group_children=0&hapos=1&hpos=1&no_rooms=2&req_adults=4&req_children=0&room1=A%2CA&room2=A%2CA&sb_price_type=total&sr_order=popularity&srepoch=1763161534&srpvid=0f8ba25ce4a10256&type=total&ucfs=1&" target="_blank"><img src="https://cdn.freebiesupply.com/logos/thumbs/2x/bookingcom-logo.png" alt="Booking" /></a>
+      </div>
+    </div>
+
+    <!-- LANGUAGE SELECTOR -->
+    <div class="language-selector">
+      <img src="../images/flags/english flag.jpg" alt="English">
+      <a href="../albanian source code/restorant.html"><img src="../images/flags/albanian flag.png" alt="Shqip"></a>
+    </div>
+
+    <!-- NAVBAR -->
+    <nav class="top-navbar">
+      <a href="iliria-main.html">Main</a>
+      <a href="restaurant.html" class="active">Restaurant</a>
+      <a href="rooms.html">Rooms</a>
+      <a href="rreth nesh.html">About Us</a>
+    </nav>
+
+    <!-- HERO TEXT -->
+    <div class="hero-text">
+      <h2><b>Welcome to Illyria Restaurant</b></h2>
+      <h4>Experience the finest Mediterranean cuisine with fresh, locally sourced ingredients in a luxurious atmosphere.</h4>
+    </div>
+
+  </section>
+
+  <!-- CONTENT SECTION 1 -->
+  <section class="content-section">
+    <img src="../images/restaurant/signature dishes.jpeg" alt="" height="800px" width="500px">
+    <div class="section-text">
+      <center><h2>Our Signature Dishes</h2>
+      <p>From locally sourced, organic meats to traditional Illyrian flavors, every dish is prepared with care and mastery. Grilled to perfection and served with elegance, our signature dishes offer a taste fit for royalty, celebrating the rich culinary heritage of Shkodër.</p>
+      <a href="../illyria - menu.html" target="_blank"><button>Discover Menu</button></a></center>
+    </div>
+  </section>
+
+  <section class="team-section">
+  <h2>Ambience and Design</h2>
+  <p>At Illyria, every corner tells a story. From the warm, inviting lighting to the elegant mix of modern comfort and Illyrian-inspired architecture, our space is designed to make guests feel both relaxed and inspired. Every detail—the carefully chosen decor, cozy seating, and soothing color palette—creates an atmosphere where conversations flow, memories are made, and every visit feels truly special.</p>
+  
+  <div class="scrolling-gallery">
+    <div class="scrolling-inner">
+      <div class="member"><img src="../images/restaurant/ambient 1.jpeg" alt="Ambience 1" height="450px"></div>
+      <div class="member"><img src="../images/restaurant/ambient 2.jpeg" alt="Ambience 2" height="450px"></div>
+      <div class="member"><img src="../images/restaurant/ambient 3.jpg" alt="Ambience 3" height="450px"></div>
+      <div class="member"><img src="../images/restaurant/ambient 4.jpeg" alt="Ambience 4" height="450px"></div>
+      <div class="member"><img src="../images/restaurant/ambient 5.jpg" alt="Ambience 5" height="450px"></div>
+
+      <!-- Duplicate images to make the scroll continuous -->
+      <div class="member"><img src="../images/restaurant/ambient 1.jpeg" alt="Ambience 1" height="450px"></div>
+      <div class="member"><img src="../images/restaurant/ambient 2.jpeg" alt="Ambience 2" height="450px"></div>
+      <div class="member"><img src="../images/restaurant/ambient 3.jpg" alt="Ambience 3" height="450px"></div>
+      <div class="member"><img src="../images/restaurant/ambient 4.jpeg" alt="Ambience 4" height="450px"></div>
+      <div class="member"><img src="../images/restaurant/ambient 5.jpg" alt="Ambience 5" height="450px"></div>
+    </div>
+  </div>
+</section>
+
+  <!-- FOOTER -->
+  <footer>
+  <div class="footer-section" style="flex: 1; text-align: center; padding: 20px;">
+    <h2 style="font-size: 2rem; color: #d4b483; margin-bottom: 15px;">Illyria Hotel & Restaurant</h2>
+    <p style="font-size: 1.1rem; line-height: 1.6; color: #f8f4ef; max-width: 300px; margin: 0 auto;">
+      Step into the elegance of ancient Illyrian architecture in the heart of Shkodër. A castle-inspired stay with warm hospitality and exquisite cuisine awaits.
+    </p>
+  </div>
+
+  <div class="footer-section" style="flex: 1; padding: 20px; background: rgba(255,255,255,0.05); border-radius: 12px;">
+    <h3 style="color: #d4b483; margin-bottom: 15px; text-align: center;">Contact</h3><br>
+    <p style="margin-bottom: 10px; font-weight: bold; color: #f8f4ef;">Call: <a href="tel:+355694085471" style="color: #f8f4ef; text-decoration: underline;">+355 69 408 5471</a></p>
+    <p style="margin-bottom: 10px; font-weight: bold; color: #f8f4ef;">WhatsApp: <a href="https://wa.me/355694085471" target="_blank" style="color: #f8f4ef; text-decoration: underline;">+355 69 408 5471</a></p>
+    <p style="margin-bottom: 10px; font-weight: bold; color: #f8f4ef;">Address: Rruga e Gjyshit, Shkodër 4001, Albania</p>
+  </div>
+
+  <div class="footer-section" style="flex: 1; padding: 20px;">
+    <h3 style="color: #d4b483; margin-bottom: 15px; text-align: center;">Find Us</h3>
+    <iframe 
+      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2963.1794203114864!2d19.481076099999996!3d42.0393328!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x134e0148822b4019%3A0xe8fe92a1de19a73b!2sHotel%20Iliria!5e0!3m2!1sen!2s!4v1763158431902!5m2!1sen!2s" 
+      allowfullscreen="" 
+      loading="lazy" 
+      style="width: 100%; height: 250px; border-radius: 12px; border: 2px solid #d4b483;">
+    </iframe>
+  </div>
+</footer>
+
+</body>
+</html>

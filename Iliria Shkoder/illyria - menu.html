@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ILLYRIA Menu</title>
+  <link rel="icon" type="image/png" href="images/illyria logo.png">
+  <style>
+    /* price badge overlay */
+  .card { position: relative; }                  /* enable absolute positioning inside */
+  .price-badge{
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
+    padding: .4rem .6rem;
+    font-weight: 700;
+    font-size: .9rem;
+    background: #798d69;       /* change to your brand color; olive-ish like screenshot */
+    color: #fff;
+    border-radius: 999px;       /* pill */
+    box-shadow: 0 2px 6px rgba(0,0,0,.2);
+  }
+  .img-wrap {
+    position: relative;
+  }
+  
+    :root{
+      --bg:#edf5e7;         /* plain background */
+      --text:#798d69;       /* main text */
+      --muted:#6b7280;      /* secondary text */
+      --accent:#798d69;     /* active tab color */
+      --card:#f2f3f6;       /* card bg */
+      --nav-bg:var(--bg);     /* navbar bg */
+      --border:#e5e7eb;     /* borders */
+      --content-max:1200px; /* navbar max width */
+      --pad:1rem;
+      --radius:14px;
+      --nav-h:64px;         /* computed at runtime */
+    }
+
+    *{box-sizing:border-box}
+    html,body{
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;
+      background:var(--bg); color:var(--text);
+      line-height:1.5;
+      padding-top:var(--nav-h); /* account for fixed navbar */
+    }
+
+    /* ===== NAVBAR ===== */
+    .navbar-wrap{position:fixed;top:0;left:0;right:0;z-index:60;}
+    nav.navbar{
+      display:flex;align-items:center;gap:.75rem;
+      max-width:var(--content-max);margin:0 auto;padding:.5rem var(--pad);
+      min-height:var(--nav-h);background:var(--nav-bg);
+      border-bottom:1px solid var(--border);
+    }
+    .nav-brand{font-weight:800;font-size:1.1rem;text-decoration:none;color:var(--text);white-space:nowrap}
+    .nav-brand:hover{color:var(--accent)}
+
+    .cat-scroll{flex:1;overflow:auto hidden;scrollbar-width:none;-ms-overflow-style:none;position:relative;mask-image:linear-gradient(90deg,transparent 0,#000 24px,#000 calc(100% - 24px),transparent 100%);} 
+    .cat-scroll::-webkit-scrollbar{display:none}
+    .cat-list{display:flex;gap:.25rem;align-items:center;padding:.25rem;flex-wrap:nowrap;}
+    .cat-list a{--p:.55rem .9rem;--r:999px;display:inline-flex;align-items:center;gap:.5ch;padding:var(--p);border-radius:var(--r);text-decoration:none;color:var(--text);white-space:nowrap;font-size:.95rem;border:1px solid transparent;transition:background .2s ease,color .2s ease,border-color .2s ease;}
+    .cat-list a:hover{background:#1118270d;border-color:#1118271a}
+    .cat-list a.active,.cat-list a[aria-current="true"]{background:var(--accent);color:#fff}
+
+    /* ===== PAGE LAYOUT ===== */
+    .menu-header{display:flex;justify-content:center;align-items:center;padding:1rem 0;}
+    .menu-logo{width:200px;height:200px;object-fit:cover;border-radius:50%;border:1px solid var(--border);background:transparent}
+
+    .container{width: 75%;max-width:750px;margin:0 auto;padding:1rem 0;}
+    @media (min-width:768px){.container{width:62%;}}
+    @media (min-width:1200px){.container{width:60%;}}
+
+    /* Sections */
+    section.category{scroll-margin-top:calc(var(--nav-h)+16px);padding:1rem 0 1.25rem;scroll-margin-top: 64px;}
+    .category .head{display:flex;justify-content:space-between;align-items:end;gap:1rem;margin:0 0 .75rem}
+    .category h2{margin:0;font-size:clamp(1.2rem,.9rem+1.1vw,1.6rem)}
+    .category .sub{color:var(--muted);font-size:.95rem}
+
+
+    /* One product per row (stacked) */
+    .grid{display:flex;flex-direction:column;gap:12px}
+    .card{background:var(--card);border:2px solid var(--border);border-radius:var(--radius);overflow:hidden;display:flex;flex-direction:column;min-height:100%}
+    .card img{display:block;width:100%;aspect-ratio:4.5/3;object-fit:cover;background:#f3f4f6}
+    .card .meta{padding:.6rem .7rem}
+    .title{font-weight:600}
+    .desc{color:var(--muted);font-size:.9rem}
+  </style>
+
+</head>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const sections = document.querySelectorAll("section.category");
+  const navLinks = document.querySelectorAll(".cat-list a");
+
+  function activateLink(id) {
+    navLinks.forEach(link => {
+      link.classList.toggle("active", link.getAttribute("href") === "#" + id);
+    });
+  }
+
+  function scrollActiveLinkIntoView() {
+    const activeLink = document.querySelector(".cat-list a.active");
+    if (activeLink) {
+      activeLink.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+    }
+  }
+
+  // Detect which section is in view
+  window.addEventListener("scroll", () => {
+    let current = "";
+    sections.forEach(section => {
+      const rect = section.getBoundingClientRect();
+      if (rect.top <= 150 && rect.bottom >= 150) {
+        current = section.getAttribute("id");
+      }
+    });
+
+    if (current) {
+      activateLink(current);
+      scrollActiveLinkIntoView();
+    }
+  });
+
+  // Smooth scroll for navbar clicks
+  navLinks.forEach(link => {
+    link.addEventListener("click", e => {
+      e.preventDefault();
+      const target = document.querySelector(link.getAttribute("href"));
+      target.scrollIntoView({ behavior: "smooth" });
+      activateLink(target.id);
+      scrollActiveLinkIntoView();
+    });
+  });
+});
+</script>
+
+<body>
+  <!-- NAVBAR -->
+  <div class="navbar-wrap" id="navbarWrap">
+    <nav class="navbar" id="navbar" role="navigation" aria-label="Category navigation">
+      <a href="#top" class="nav-brand">ILLYRIA</a>
+      <div class="cat-scroll" id="catScroll">
+        <div class="cat-list" id="catList">
+          <a href="#salads">Salads</a>
+          <a href="#garnish">Garnish</a>
+          <a href="#appetizer">Appetizer</a>
+          <a href="#soups">Soups</a>
+          <a href="#risotto">Risottos</a>
+          <a href="#pasta">Pasta</a>
+          <a href="#grilled_meat">Grilled Meat</a>
+          <a href="#meat_specials">Specials Meat</a>
+          <a href="#baked_fish">Baked Fish</a>
+          <a href="#grilled_fish">Grilled Fish</a>
+          <a href="#fish_specials">Specials Fish</a>
+          <a href="#pizza">Pizza</a>
+        </div>
+      </div>
+    </nav>
+  </div>
+
+  <!-- HEADER: centered image only -->
+  <header class="menu-header" id="top">
+    <!-- Replace src with your header photo/logo (square) -->
+    <img class="menu-logo" src="images/illyria logo.png" alt="Illyrian header image placeholder" style="border: solid 2px rgb(189, 184, 184);"/>
+  </header>
+
+  <!-- CONTENT -->
+  <div class="container">
+
+    <!-- ======= CATEGORIES ======= -->
+
+    <section class="category" id="salads" data-label="Salads">
+      <div class="head"><h2>Sallata / Salads</h2><div class="sub"></div></div>
+      <div class="grid">
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="images/menu/sallata/sallate fshati.jpeg" alt="SALLATË FSHATI / Village Salad"><span class="price-badge">450 LEK</span></div><div class="meta"><div class="title">SALLATË FSHATI / Village Salad</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="images/menu/sallata/sallate mix.jpeg" alt="SALLATË MIX / Mixed Salad"><span class="price-badge">400 LEK</span></div><div class="meta"><div class="title">SALLATË MIX / Mix Salad</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="images/menu/sallata/perime zgare.jpeg" alt="PERIME ZGARE / Grill Vegetables"><span class="price-badge">450 LEK</span></div><div class="meta"><div class="title">PERIME ZGARE / Grill Vegetables</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="images/menu/sallata/sallate iliria.jpeg" alt="SALLATË ILIRIA / Iliria Salad"><span class="price-badge">600 LEK</span></div><div class="meta"><div class="title">SALLATË ILIRIA / Iliria Salad</div><div class="desc">Radikio, Sallatë jeshile, Arra, Avokado, Mollë, Salcë <br><i>Radicchio, Green Salad, Walnuts, Avocado, Apple, Sauce</i></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="images/menu/sallata/sallate cezar.jpeg" alt="SALLATË ÇEZAR / Caesar Salad"><span class="price-badge">600 LEK</span></div><div class="meta"><div class="title">SALLATË ÇEZAR / Caesar Salad</div><div class="desc">Gjethe jeshile, Pomodorini, Avokado, Kastravec, Parmiggiano, Pulë zgare, Salcë pesto <br><i>Green leaf, Arugula, Avocado, Cucumber, Parmiggiano, Grilled chicken, Pesto sauce</i></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="images/menu/sallata/rukola pomodorini & grana.jpeg" alt="RUKOLA, POMODORINI & GRANA / Arugula, Pomodorini & Grana"><span class="price-badge">500 LEK</span></div><div class="meta"><div class="title">RUKOLA, POMODORINI & GRANA / Arugula, Pomodorini & Grana</div><div class="desc"></div></div></article>
+        </div>
+    </section>
+
+    <section class="category" id="garnish" data-label="Garnish">
+      <div class="head"><h2>Garnitura / Garnish</h2><div class="sub"></div></div>
+      <div class="grid">
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="images/menu/garnitura/djathe dhie.jpeg" alt="DJATHË DHIE / Goat Cheese"><span class="price-badge">350 LEK</span></div><div class="meta"><div class="title">DJATHË DHIE / Goat Cheese</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="images/menu/garnitura/djathe dhie furre.jpeg" alt="DJATHË DHIE FURRE / Oven Baked Goat Cheese"><span class="price-badge">400 LEK</span></div><div class="meta"><div class="title">DJATHË DHIE FURRE / Oven Baked Goat Cheese</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="images/menu/garnitura/djathe kackavall.jpeg" alt="DJATHË KAÇKAVALL / Cheddar Cheese"><span class="price-badge">350 LEK</span></div><div class="meta"><div class="title">DJATHË KAÇKAVALL / Cheddar Cheese</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="images/menu/garnitura/djathe mix.jpeg" alt="DJATHË MIKS / Mixed Cheese"><span class="price-badge">850 LEK</span></div><div class="meta"><div class="title">DJATHË MIKS / Mixed Cheese</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="images/menu/garnitura/patate te skuqura.jpeg" alt="PATATE TË SKUQURA / Fried Potatoes"><span class="price-badge">300 LEK</span></div><div class="meta"><div class="title">PATATE TË SKUQURA / Fried Potatoes</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="images/menu/garnitura/salce kosi.jpeg" alt="SALCË KOSI / Tzatziki"><span class="price-badge">250 LEK</span></div><div class="meta"><div class="title">SALCË KOSI / Tzatziki</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="images/menu/garnitura/kallamoqe me shellire.jpeg" alt="KALLAMOQE ME SHËLLIRË"><span class="price-badge">150 LEK</span></div><div class="meta"><div class="title">KALLAMOQE ME SHËLLIRË</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="images/menu/garnitura/patellxhan parmigiano.jpeg" alt="PATËLLXHAN PARMIGGIANO / Parmiggiano Eggplant"><span class="price-badge">550 LEK</span></div><div class="meta"><div class="title">PATËLLXHAN PARMIGGIANO / Parmiggiano Eggplant</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="images/menu/garnitura/tave dheu.jpeg" alt="TAVË DHEU / Albanian Clay Pot Dish"><span class="price-badge">650 LEK</span></div><div class="meta"><div class="title">TAVË DHEU / Albanian Clay Pot Dish</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="images/menu/garnitura/patate, gorgonxola pane dhe proshute.jpeg" alt="PATATE, GORGONXOLA, PANA & PROSHUTË / Potatoes, Gorgonzola, Panna & Ham"><span class="price-badge">500 LEK</span></div><div class="meta"><div class="title">PATATE, GORGONXOLA, PANA & PROSHUTË / Potatoes, Gorgonzola, Panna & Ham</div><div class="desc"></div></div></article>
+      </div>
+    </section>
+
+    <section class="category" id="appetizer" data-label="Appetizer">
+      <div class="head"><h2>Antipasta / Appetizer</h2><div class="sub"></div></div>
+      <div class="grid">
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="images/menu/antipasta/antipaste shtepie.jpeg" alt="ANTIPASTË SHTËPIE / Home Appetizer"><span class="price-badge">850 LEK</span></div><div class="meta"><div class="title">ANTIPASTË SHTËPIE / Home Appetizer</div><div class="desc">Byrek, Japrak, Qofte, Salcë kosi, Turshi <br><i>Pie, Stuffed Grape Leaves, Meatballs, Sour Cream, Pickles</i></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="images/menu/antipasta/antipaste deti krudo.jpeg" alt="ANTIPASTË DETI KRUDO / Crudo Sea Appetizer"><span class="price-badge">1500 - 3000 LEK</span></div><div class="meta"><div class="title">ANTIPASTË DETI KRUDO / Crudo Sea Appetizer</div><div class="desc">Karkalec, Kallamar, Oktapod, Axhiuge, Fileto peshku <br><i>Shrimp, Squid, Octopus, Axhiuge, Fish fillet</i></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="images/menu/antipasta/antipaste ballkani.jpeg" alt="ANTIPASTË BALLKANI / Balkan Appetizer"><span class="price-badge">1200 LEK</span></div><div class="meta"><div class="title">ANTIPASTË BALLKANI / Balkan Appetizer</div><div class="desc">Suxhuk, Vishlla, Sallam, Piskavicë me djathë, qebap <br><i>Pepperoni, Hot Dog, Salami, Pljeskavica with cheese, Kebab</i></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="images/menu/antipasta/qofte shtepie me salce.jpeg" alt="QOFTE SHTËPIE ME SALCË / Homemade Meatballs with Sauce"><span class="price-badge">700 LEK</span></div><div class="meta"><div class="title">QOFTE SHTËPIE ME SALCË / Homemade Meatballs with Sauce</div><div class="desc"></div></div></article>
+        </div>
+    </section>
+
+    <section class="category" id="soups" data-label="Soups">
+      <div class="head"><h2>Supat / Soups</h2><div class="sub"></div></div>
+      <div class="grid">
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="images/menu/supa/supe me perime.jpeg" alt="SUPË ME PERIME / Vegetables Soup"><span class="price-badge">350 LEK</span></div><div class="meta"><div class="title">SUPË ME PERIME / Vegetables Soup</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="images/menu/supa/supe peshku.jpeg" alt="SUPË PESHKU / Fish Soup"><span class="price-badge">400 LEK</span></div><div class="meta"><div class="title">SUPË PESHKU / Fish Soup</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="images/menu/supa/supe pule.jpeg" alt="SUPË PULE / Chicken Soup"><span class="price-badge">350 LEK</span></div><div class="meta"><div class="title">SUPË PULE / Chicken Soup</div><div class="desc"></div></div></article>
+        </div>
+    </section>
+
+    <section class="category" id="risotto" data-label="Risotto">
+      <div class="head"><h2>Rizoto / Risotto</h2><div class="sub"></div></div>
+      <div class="grid">
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="images/menu/rizoto/rizoto me perime.jpeg" alt="RIZOTO ME PERIME / Risotto with Vegetables"><span class="price-badge">700 LEK</span></div><div class="meta"><div class="title">RIZOTO ME PERIME / Risotto with Vegetables</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="images/menu/rizoto/rizoto fruta deti.jpeg" alt="RIZOTO ME FRUTA DETI / Risotto with Seafood"><span class="price-badge">900 LEK</span></div><div class="meta"><div class="title">RIZOTO ME FRUTA DETI / Risotto with Seafood</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="images/menu/rizoto/rizoto karkalec.jpeg" alt="RIZOTO ME KARKALECA / Risotto with shrimps"><span class="price-badge">1000 LEK</span></div><div class="meta"><div class="title">RIZOTO ME KARKALECA / Risotto with shrimps</div><div class="desc"></div></div></article>
+        </div>
+    </section>
+
+    <section class="category" id="pasta" data-label="Pasta">
+      <div class="head"><h2>Pasta të freskëta / Fresh Pasta</h2><div class="sub"></div></div>
+      <div class="grid">
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="images/menu/pasta/pene me ragu.jpeg" alt="PENNE ME RAGU / Penne with Ragu"><span class="price-badge">700 LEK</span></div><div class="meta"><div class="title">PENNE ME RAGU / Penne with Ragu</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="images/menu/pasta/linguine me mish gaforre.jpeg" alt="LINGUINE ME MISH GAFORRE, ASPARAGUS, POMODORINI, SPEC DJEGËS / Linguine with Crab Meat, Asparagus, Pomodorini, Chilli Pepper"><span class="price-badge">750 LEK</span></div><div class="meta"><div class="title">LINGUINE ME MISH GAFORRE, ASPARAGUS, POMODORINI, SPEC DJEGËS / Linguine with Crab Meat, Asparagus, Pomodorini, Chilli Pepper</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="images/menu/pasta/linguine me fruta deti.jpeg" alt="LINGUINE ME FRUTA DETI / Linguine with Seafood"><span class="price-badge">900 LEK</span></div><div class="meta"><div class="title">LINGUINE ME FRUTA DETI / Linguine with Seafood</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="images/menu/pasta/linguine me karkaleca.jpeg" alt="LINGUINE ME KARKALECA / Linguine with Shrimps"><span class="price-badge">1000 LEK</span></div><div class="meta"><div class="title">LINGUINE ME KARKALECA / Linguine with Shrimps</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="images/menu/pasta/ravioli 4 djathra.jpeg" alt="RAVIOLI 4 DJATHRAT / Four-Cheese Ravioli"><span class="price-badge">650 LEK</span></div><div class="meta"><div class="title">RAVIOLI 4 DJATHRAT / Four-Cheese Ravioli</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="images/menu/pasta/ravioli me pule, pesto.jpeg" alt="RAVIOLI ME PULË, PESTO, GORGONXOLA, SPINAQ, POMODORINI / Ravioli with Chicken, Pesto, Gorgonzola, Spinach, Pomodorini"><span class="price-badge">750 LEK</span></div><div class="meta"><div class="title">RAVIOLI ME PULË, PESTO, GORGONXOLA, SPINAQ, POMODORINI / Ravioli with Chicken, Pesto, Gorgonzola, Spinach, Pomodorini</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="images/menu/pasta/tagliatelle me karkaleca dhe tartuf.jpeg" alt="TALIATELE ME KARKALECA & TARTUF / Tagliatelle with Shrimps & Truffle"><span class="price-badge">1000 LEK</span></div><div class="meta"><div class="title">TALIATELE ME KARKALECA & TARTUF / Tagliatelle with Shrimps & Truffle</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="images/menu/pasta/tortellini me pana dhe spinaq.jpeg" alt="TORTELINI ME POMODORINI, PANA & SPINAQ / Tortellini with Pomodorini, Panna & Spinach"><span class="price-badge">750 LEK</span></div><div class="meta"><div class="title">TORTELINI ME POMODORINI, PANA & SPINAQ / Tortellini with Pomodorini, Panna & Spinach</div><div class="desc"></div></div></article> 
+      </div>
+    </section>
+
+    <section class="category" id="grilled_meat" data-label="Grilled Meat">
+      <div class="head"><h2>Mish Zgare / Grilled Meat</h2><div class="sub"></div></div>
+      <div class="grid">
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="images/menu/mish zgare/bri vici zgare me patate furre.jpeg" alt="BRI VIÇI ZGARRE ME PATATE FURRE / Grilled Beef Ribs with Oven Baked Potatoes"><span class="price-badge">1250 LEK</span></div><div class="meta"><div class="title">BRI VIÇI ZGARRE ME PATATE FURRE / Grilled Beef Ribs with Oven Baked Potatoes</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="images/menu/mish zgare/fileto vici.jpeg" alt="FILETO VIÇI / Grilled Beef Fillet"><span class="price-badge">1450 LEK</span></div><div class="meta"><div class="title">FILETO VIÇI / Grilled Beef Fillet</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="images/menu/mish zgare/fileto pule zgare me patate .jpeg" alt="FILETO PULE ZGARE ME PATATE TË SKUQURA / Grilled Chicken Fillet with Fried Potatoes"><span class="price-badge">850 LEK</span></div><div class="meta"><div class="title">FILETO PULE ZGARE ME PATATE TË SKUQURA / Grilled Chicken Fillet with Fried Potatoes</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="images/menu/mish zgare/mish mix zgare iliria.jpeg" alt="MISH MIKS ZGARE ILIRIA / Iliria Mixed Grilled Meat"><span class="price-badge">1650 LEK</span></div><div class="meta"><div class="title">MISH MIKS ZGARE ILIRIA / Iliria Grilled Mixed Meat</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="images/menu/mish zgare/qingj furre.jpeg" alt="QINGJ FURRE / Oven Baked Lambs"><span class="price-badge">1550 LEK</span></div><div class="meta"><div class="title">QINGJ FURRE / Oven Baked Lambs</div><div class="desc">Pjatë e Shtëpisë Tradicionale <br><i>Traditional Home Dish</i></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="images/menu/mish zgare/berxolle zgare.jpeg" alt="BËRXOLLË ZGARE / Grilled Chops"><span class="price-badge">1250 LEK</span></div><div class="meta"><div class="title">BËRXOLLË ZGARE / Grilled Chops</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="images/menu/mish zgare/fiorentina.jpeg" alt="FIORENTINA / Tomahawk"><span class="price-badge">3800 LEK</span></div><div class="meta"><div class="title">FIORENTINA / Tomahawk</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="images/menu/mish zgare/fileto vici me gramature.jpeg" alt="FILETO VIÇI ME GRAMATURË / Grilled Beef Fillet (Served by weight)"><span class="price-badge">7000 LEK/kg</span></div><div class="meta"><div class="title">FILETO VIÇI ME GRAMATURË / Grilled Beef Fillet (Served by weight)</div><div class="desc"></div></div></article>
+        </div>
+    </section>
+
+    <section class="category" id="meat_specials" data-label="Specials Meat">
+      <div class="head"><h2>Specialitete Mishi / Specials Meat</h2><div class="sub"></div></div>
+      <div class="grid">
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="images/menu/specialitete mishi/fileto vici al pepe verde.jpeg" alt="FILETO VIÇI AL PEPE VERDE / Beef Fillet Al Pepe Verde"><span class="price-badge">1500 LEK</span></div><div class="meta"><div class="title">FILETO VIÇI AL PEPE VERDE / Beef Fillet Al Pepe Verde</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="images/menu/specialitete mishi/fileto vici me salce tartufi.jpeg" alt="FILETO VIÇI ME SALCË TARTUFI / Beef Fillet with Truffle Sauce"><span class="price-badge">1500 LEK</span></div><div class="meta"><div class="title">FILETO VIÇI ME SALCË TARTUFI / Beef Fillet with Truffle Sauce</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="images/menu/specialitete mishi/fileto vici iliria.jpeg" alt="FILETO VIÇI ILIRIA / Beef Fillet Iliria"><span class="price-badge">1500 LEK</span></div><div class="meta"><div class="title">FILETO VIÇI ILIRIA / Beef Fillet Iliria</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="images/menu/specialitete mishi/eskallop vici me vere dhe limon.jpeg" alt="ESKALLOP VIÇI ME VERË & LIMON / Calf Escalope with Wine & Lemon"><span class="price-badge">1350 LEK</span></div><div class="meta"><div class="title">ESKALLOP VIÇI ME VERË & LIMON / Calf Escalope with Wine & Lemon</div><div class="desc"></div></div></article>
+        </div>
+    </section>
+
+    <section class="category" id="baked_fish" data-label="Baked Fish">
+      <div class="head"><h2>Peshk Furre / Oven Baked Fish</h2><div class="sub">Tradicionale</div></div>
+      <div class="grid">
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="images/menu/peshk furre/tave krapi.jpeg" alt="TAVË KRAPI / Traditional Oven Baked Carp"><span class="price-badge">1250 LEK</span></div><div class="meta"><div class="title">TAVË KRAPI / Traditional Oven Baked Carp</div><div class="desc">Fitues i çmimit të parë <br><i>Winner of the first place</i></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="images/menu/peshk furre/krap ne tjegull.jpeg" alt="KRAP NË TJEGULL / Tile Baked Carp"><span class="price-badge">1250 LEK</span></div><div class="meta"><div class="title">KRAP NË TJEGULL / Tile Baked Carp</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="images/menu/peshk furre/ngjale furre.jpeg" alt="NGJALË FURRE / Oven Baked Eel"><span class="price-badge">1850 LEK</span></div><div class="meta"><div class="title">NGJALË FURRE / Oven Baked Eel</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="images/menu/peshk furre/levrek furre.jpeg" alt="LEVREK FURRE / Oven Baked Seabass"><span class="price-badge">1350 LEK</span></div><div class="meta"><div class="title">LEVREK FURRE / Oven Baked Seabass</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="images/menu/peshk furre/koce furre.jpeg" alt="KOCË FURRE / Oven Sea Bream"><span class="price-badge">1300 LEK</span></div><div class="meta"><div class="title">KOCË FURRE / Oven Sea Bream</div><div class="desc"></div></div></article>
+        </div>
+    </section>
+
+    <section class="category" id="grilled_fish" data-label="Grilled Fish">
+      <div class="head"><h2>Peshk Zgare / Grilled Fish</h2><div class="sub"></div></div>
+      <div class="grid">
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="images/menu/peshk zgare/levrek zgare i hapur.jpeg" alt="LEVREK ZGARE I HAPUR / Grilled Open Bass"><span class="price-badge">1300 LEK</span></div><div class="meta"><div class="title">LEVREK ZGARE I HAPUR / Grilled Open Bass</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="images/menu/peshk zgare/krap zgare.jpeg" alt="KRAP ZGARE / Grilled Carp"><span class="price-badge">1200 LEK</span></div><div class="meta"><div class="title">KRAP ZGARE / Grilled Carp</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="images/menu/peshk zgare/koce zgare.jpeg" alt="KOCË ZGARE / Grilled Sea Bream"><span class="price-badge">1250 LEK</span></div><div class="meta"><div class="title">KOCË ZGARE / Grilled Sea Bream</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="images/menu/peshk zgare/karkaleca zgare.jpeg" alt="KARKALECA ZGARE / Grilled Shrimps"><span class="price-badge">1450 LEK</span></div><div class="meta"><div class="title">KARKALECA ZGARE / Grilled Shrimps</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="images/menu/peshk zgare/fruta deti mix.jpeg" alt="FRUTA DETI MIKS / Grilled Mixed Seafood"><span class="price-badge">1300 LEK</span></div><div class="meta"><div class="title">FRUTA DETI MIKS / Grilled Mixed Seafood</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="images/menu/peshk zgare/kallamar zgare.jpeg" alt="KALLAMARË ZGARE / Grilled Squid"><span class="price-badge">1200 LEK</span></div><div class="meta"><div class="title">KALLAMARË ZGARE / Grilled Squid</div><div class="desc"></div></div></article>
+        </div>
+    </section>
+
+    <section class="category" id="fish_specials" data-label="Specials Fish">
+      <div class="head"><h2>Specialitete Peshku / Specials Fish</h2><div class="sub"></div></div>
+      <div class="grid">
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="images/menu/specialitete peshku/fileto levreku me agrume.jpeg" alt="FILETO LEVREKU ME AGRUME / Bass Fillet with Citrus"><span class="price-badge">1350 LEK</span></div><div class="meta"><div class="title">FILETO LEVREKU ME AGRUME / Bass Fillet with Citrus</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="images/menu/specialitete peshku/karkaleca me salce konjaku.jpeg" alt="KARKALECA ME SALCË KONJAKU / Shrimps with Cognac Sauce"><span class="price-badge">1500 LEK</span></div><div class="meta"><div class="title">KARKALECA ME SALCË KONJAKU / Shrimps with Cognac Sauce</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="images/menu/specialitete peshku/fruta deti te skuqura.jpeg" alt="FRUTA DETI TË SKUQURA / Fried Seafood"><span class="price-badge">1350 LEK</span></div><div class="meta"><div class="title">FRUTA DETI TË SKUQURA / Fried Seafood</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="images/menu/specialitete peshku/salmon me shafran dhe bajame.jpeg" alt="SALMON ME SHAFRAN & BAJAME / Salmon with Saffron & Almonds"><span class="price-badge">1250 LEK</span></div><div class="meta"><div class="title">SALMON ME SHAFRAN & BAJAME / Salmon with Saffron & Almonds</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="images/menu/specialitete peshku/levrek me pistakio.jpeg" alt="LEVREK ME PISTAKIO / Oven Baked Sea Bass with Pistachio"><span class="price-badge">1400 LEK</span></div><div class="meta"><div class="title">LEVREK ME PISTAKIO / Oven Baked Sea Bass with Pistachio</div><div class="desc"></div></div></article>
+      </div>
+    </section>
+
+    <section class="category" id="pizza" data-label="Pizza">
+      <div class="head"><h2>Pica / Pizza</h2><div class="sub"></div></div>
+      <div class="grid">
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="images/menu/pica/pica margarita.jpeg" alt="PICA MARGARITA / Pizza Margherita"><span class="price-badge">550 LEK</span></div><div class="meta"><div class="title">PICA MARGARITA / Pizza Margherita</div><div class="desc">Salcë picash, Djathë Mozarele <br><i>Pizza Sauce, Mozzarella Cheese</i></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="images/menu/pica/pica kapricoza.jpeg" alt="PICA KAPRIÇOZA / Pizza Capricciosa"><span class="price-badge">700 LEK</span></div><div class="meta"><div class="title">PICA KAPRIÇOZA / Pizza Capricciosa</div><div class="desc">Salcë picash, Djathë Mozarele, Proshutë, Sallam, Kërpudha, Ullinj <br><i>Pizza Sauce, Mozzarella Cheese, Ham, Salami, Mushrooms, Olives</i></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="images/menu/pica/pica 4 stinet.jpeg" alt="PICA 4 STINËT / Pizza 4 Seasons"><span class="price-badge">700 LEK</span></div><div class="meta"><div class="title">PICA 4 STINËT / Pizza 4 Seasons</div><div class="desc">Salcë picash, Djathë Mozarele, Proshutë, Sallam, Kërpudha, Ullinj <br><i>Pizza Sauce, Mozzarella Cheese, Ham, Salami, Mushrooms, Olives</i></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="images/menu/pica/pica 4 djathrat.jpeg" alt="PICA 4 DJATHRAT / Pizza 4 Cheese"><span class="price-badge">700 LEK</span></div><div class="meta"><div class="title">PICA 4 DJATHRAT / Pizza 4 Cheese</div><div class="desc">Salcë picash, Djathë Mozarele, Guda, Gorgonxola, Parmixhano <br><i>Pizza Sauce, Mozzarella Cheese, Gouda, Gorgonzola, Parmigiano</i></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="images/menu/pica/pica sallam.jpeg" alt="PICA SALLAM PIKANT / Pizza with Spicy Salami"><span class="price-badge">700 LEK</span></div><div class="meta"><div class="title">PICA SALLAM PIKANT / Pizza with Spicy Salami</div><div class="desc">Salcë picash, Djathë Mozarele, Sallam Pikant <br><i>Pizza Sauce, Mozzarella Cheese, Spicy Salami</i></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="images/menu/pica/pica sallam.jpeg" alt="PICA SALLAM / Pizza with Salami"><span class="price-badge">700 LEK</span></div><div class="meta"><div class="title">PICA SALLAM / Pizza with Salami</div><div class="desc">Salcë picash, Djathë Mozarele, Sallam <br><i>Pizza Sauce, Mozzarella Cheese, Salami</i></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="images/menu/pica/pica proshute.jpeg" alt="PICA PROSHUTË / Pizza with Ham"><span class="price-badge">700 LEK</span></div><div class="meta"><div class="title">PICA PROSHUTË / Pizza with Ham</div><div class="desc">Salcë picash, Djathë Mozarele, Proshutë <br><i>Pizza Sauce, Mozzarella Cheese, Ham</i></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="images/menu/pica/pica sallam proshute.jpeg" alt="PICA SALLAM & PROSHUTË / Pizza with Salami & Ham"><span class="price-badge">700 LEK</span></div><div class="meta"><div class="title">PICA SALLAM & PROSHUTË / Pizza with Salami & Ham</div><div class="desc">Salcë picash, Djathë Mozarele, Sallam, Proshutë <br><i>Pizza Sauce, Mozzarella Cheese, Salami, Ham</i></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="images/menu/pica/pica wudy dhe patate.jpeg" alt="PICA ME VUDI & PATATE / Pizza Wudy & Potatoes"><span class="price-badge">700 LEK</span></div><div class="meta"><div class="title">PICA ME VUDI & PATATE / Pizza Wudy & Potatoes</div><div class="desc">Salcë picash, Djathë Mozarele, Vudi, Patate <br><i>Pizza Sauce, Mozzarella Cheese, Wudy, Potatoes</i></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="images/menu/pica/pica verore.jpeg" alt="PICA VERORE / Pizza Summer"><span class="price-badge">700 LEK</span></div><div class="meta"><div class="title">PICA VERORE / Pizza Summer</div><div class="desc">Grana, Pomodorini, Rukola <br><i>Grana, Pomodorini, Rukola</i></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="images/menu/pica/brusketa.jpeg" alt="BRUSKETI / Bruschetta"><span class="price-badge">400 LEK</span></div><div class="meta"><div class="title">BRUSKETI / Bruschetta</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="images/menu/pica/pica ton.jpeg" alt="PICA TON / Pizza with Ton"><span class="price-badge">700 LEK</span></div><div class="meta"><div class="title">PICA TON / Pizza with Ton</div><div class="desc">Salcë picash, Djathë Mozarele, Ton <br><i>Pizza Sauce, Mozzarella Cheese, Ton Fish</i></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="images/menu/pica/pice fruta deti.jpeg" alt="PICA FRUTA DETI / Pizza with Seafood"><span class="price-badge">800 LEK</span></div><div class="meta"><div class="title">PICA FRUTA DETI / Pizza with Seafood</div><div class="desc">Salcë picash, Djathë Mozarele, Fruta deti <br><i>Pizza Sauce, Mozzarella Cheese, Seafood</i></div></div></article>  
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="images/menu/pica/pica karkalec.jpeg" alt="PICA ME KARKALEC / Pizza with Shrimps"><span class="price-badge">900 LEK</span></div><div class="meta"><div class="title">PICA ME KARKALEC / Pizza with Shrimps</div><div class="desc">Salcë picash, Djathë Mozarele, Pomodorini, Karkaleca <br><i>Pizza Sauce, Mozzarella Cheese, Pomodorini, Shrimps</i></div></div></article>  
+      </div>
+    </section>
+
+</div>
+
+  <script>
+    // Utilities
+    const $=(s,el=document)=>el.querySelector(s);
+    const $$=(s,el=document)=>[...el.querySelectorAll(s)];
+
+    function syncNavHeightVar(){
+      const navbar=$('#navbar');
+      if(!navbar)return;
+      const h=Math.ceil(navbar.getBoundingClientRect().height);
+      document.documentElement.style.setProperty('--nav-h',h+'px');
+    }
+
+    function setupSmoothScroll(){
+      // Nav tabs smooth scroll
+      $('#catList').addEventListener('click',e=>{
+        const link=e.target.closest('a[href^="#"]');
+        if(!link)return;
+        e.preventDefault();
+        const id=link.getAttribute('href');
+        const target=document.querySelector(id);
+        if(target){target.scrollIntoView({behavior:'smooth',block:'start'});}        
+      });
+      // Brand scroll to top
+      const brand=$('.nav-brand');
+      if(brand){brand.addEventListener('click',e=>{e.preventDefault();window.scrollTo({top:0,behavior:'smooth'});});}
+    }
+
+    function setupScrollSpy(){
+      const sections=$$('.category');
+      const links=$$('#catList a');
+
+      const activate=id=>{
+        links.forEach(a=>{
+          const on=a.getAttribute('href')==='#'+id;
+          a.classList.toggle('active',on);
+          if(on)a.setAttribute('aria-current','true'); else a.removeAttribute('aria-current');
+        });
+        // Keep active tab in view for long menus
+        const activeLink=[...links].find(a=>a.classList.contains('active'));
+        const scroller=$('#catScroll');
+        if(activeLink&&scroller){
+          const l=activeLink.getBoundingClientRect();
+          const s=scroller.getBoundingClientRect();
+          if(l.left < s.left || l.right > s.right){
+            scroller.scrollBy({left:(l.left < s.left) ? (l.left - s.left - 16) : (l.right - s.right + 16), behavior:'smooth'});
+          }
+        }
+      };
+
+      // IntersectionObserver (primary)
+      const observer=new IntersectionObserver(entries=>{
+        entries.forEach(entry=>{ if(entry.isIntersecting) activate(entry.target.id); });
+      },{
+        root:null,
+        threshold:0.35, // a bit earlier than halfway for tall sections
+        rootMargin:`-${parseInt(getComputedStyle(document.documentElement).getPropertyValue('--nav-h'))+16}px 0px -60% 0px`
+      });
+      sections.forEach(sec=>observer.observe(sec));
+
+      // Fallback: on scroll, choose the nearest section to the top
+      let ticking=false;
+      const onScroll=()=>{
+        if(ticking) return; ticking=true;
+        requestAnimationFrame(()=>{
+          const navH=parseInt(getComputedStyle(document.documentElement).getPropertyValue('--nav-h'))||0;
+          const y=window.scrollY + navH + 48;
+          let currentId=sections[0]?.id;
+          for(const sec of sections){ if(sec.offsetTop <= y) currentId=sec.id; else break; }
+          if(currentId) activate(currentId);
+          ticking=false;
+        });
+      };
+      window.addEventListener('scroll', onScroll, {passive:true});
+      // Run once to set initial state
+      onScroll();
+    }
+
+    // Basic sanity tests (console)
+    function runTests(){
+      const nav=$('#catList');
+      console.assert(!!nav,'Nav list exists');
+      const links=[...nav.querySelectorAll('a')];
+      console.assert(links.length===10,'Expected 10 nav items');
+      links.forEach(a=>{ const id=a.getAttribute('href'); const t=document.querySelector(id); console.assert(!!t, `Target exists for ${a.textContent}`); });
+      console.assert(typeof IntersectionObserver !== 'undefined','IntersectionObserver supported');
+      console.log('%cScroll‑spy ready','padding:2px 6px;border-radius:6px;background:#10b981;color:#fff');
+    }
+
+    // Init
+    window.addEventListener('load',()=>{syncNavHeightVar();setupSmoothScroll();setupScrollSpy();runTests();});
+    window.addEventListener('resize',syncNavHeightVar);
+  </script>
+</body>
+</html>
