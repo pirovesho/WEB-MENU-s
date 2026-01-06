@@ -20,21 +20,32 @@
     border-radius: 999px;       /* pill */
     box-shadow: 0 2px 6px rgba(0,0,0,.2);
   }
+
+  .price-badge-1{
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    padding: .4rem .6rem;
+    font-weight: 700;
+    font-size: .9rem;
+    background: #5d7a73;       /* change to your brand color; olive-ish like screenshot */
+    color: #fff;
+    border-radius: 999px;       /* pill */
+    box-shadow: 0 2px 6px rgba(0,0,0,.2);
+  }
+
+
   .img-wrap {
     position: relative;
   }
-  
-
 
     :root{
-      --bg:#eaf1f0;         /* plain background */
+              /* plain background */
       --text:#5d7a73;       /* main text */
       --muted:#6b7280;      /* secondary text */
-      --accent:#5d7a73;     /* active tab color */
-      --card:#f2f3f6;       /* card bg */
-      --nav-bg:#eaf1f0;     /* navbar bg */
-      --border:#e5e7eb;     /* borders */
-      --content-max:1200px; /* navbar max width */
+      --accent:#526b65;     /* active tab color */
+      --card:transparent;       /* card bg */
+      --border:#5d7a73;     /* borders */
       --pad:1rem;
       --radius:14px;
       --nav-h:64px;         /* computed at runtime */
@@ -43,20 +54,45 @@
     *{box-sizing:border-box}
     html,body{
       margin:0;
-      font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;
-      background:var(--bg); color:var(--text);
+      font-family: 'Fira Sans Condensed', sans-serif;
+      background:var(--bg); 
+      color:var(--text);
       line-height:1.5;
       padding-top:var(--nav-h); /* account for fixed navbar */
     }
 
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background: url("background NOOR.jpeg") center/cover no-repeat;
+      opacity: 1;               /* adjust transparency (0 = invisible, 1 = solid) */
+      z-index: -1;                 /* put behind everything */
+      pointer-events: none;        /* background remains unclickable */
+    }
+
     /* ===== NAVBAR ===== */
     .navbar-wrap{position:fixed;top:0;left:0;right:0;z-index:60;}
-    nav.navbar{
-      display:flex;align-items:center;gap:.75rem;
-      max-width:var(--content-max);margin:0 auto;padding:.5rem var(--pad);
-      min-height:var(--nav-h);background:var(--nav-bg);
-      border-bottom:1px solid var(--border);
+    
+
+    nav.navbar {
+      background: url("background NOOR.jpeg") center/cover no-repeat;
+      background-attachment: fixed; /* keeps the background in place while scrolling */
+      position: fixed;
+      top: 0;
+      left: 50%;                   /* start from the center of the page */
+      transform: translateX(-50%); /* shift back half its width to truly center */
+      width: 1050px;               /* fixed navbar width */
+      height: var(--nav-h);        /* 64px */
+      z-index: 1000;
+
+      display: flex;               /* flexbox to center content inside navbar */
+      justify-content: center;
+      align-items: center;
+      gap: 1rem;                   /* spacing between navbar items */
     }
+    
     .nav-brand{font-weight:800;font-size:1.1rem;text-decoration:none;color:var(--text);white-space:nowrap}
     .nav-brand:hover{color:var(--accent)}
 
@@ -69,7 +105,7 @@
 
     /* ===== PAGE LAYOUT ===== */
     .menu-header{display:flex;justify-content:center;align-items:center;padding:1rem 0;}
-    .menu-logo{width:200px;height:200px;object-fit:cover;border-radius:50%;border:1px solid var(--border);background:transparent}
+    .menu-logo{width:200px;height:200px;object-fit:cover;border-radius:50%;background:transparent}
 
     .container{width: 68%;max-width:550px;margin:0 auto;padding:1rem 0;}
     @media (min-width:768px){.container{width:62%;}}
@@ -84,11 +120,44 @@
 
     /* One product per row (stacked) */
     .grid{display:flex;flex-direction:column;gap:12px}
-    .card{background:var(--card);border:2px solid var(--border);border-radius:var(--radius);overflow:hidden;display:flex;flex-direction:column;min-height:100%}
+    .card{background:var(--card); border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;display:flex;flex-direction:column;min-height:100%}
     .card img{display:block;width:100%;aspect-ratio:3/4;object-fit:cover;background:#f3f4f6}
     .card .meta{padding:.6rem .7rem}
     .title{font-weight:600}
     .desc{color:var(--muted);font-size:.9rem}
+
+
+    .new-badge{
+      position: absolute;
+      top: 10px;                 /* distance from top edge of image */
+      right: 10px;               /* distance from right edge of image */
+      width: 55px;               /* circle size (adjust) */
+      height: 55px;
+      line-height: 55px;         /* vertically center single-line text */
+      display: inline-block;
+      text-align: center;
+      font-weight: 700;
+      font-size: .75rem;        /* smaller than price, adjust if needed */
+      background: #5d7a73;      /* same color as price-badge */
+      color: #fff;
+      border-radius: 50%;       /* perfect circle */
+      box-shadow: 0 2px 6px rgba(0,0,0,.2);
+      z-index: 5;               /* above the image but below any overlays you might add later */
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      pointer-events: none;     /* so badge doesn't interfere with clicks */
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Slightly smaller circle on small screens */
+    @media (max-width: 420px) {
+      .new-badge {
+        width: 34px;
+        height: 34px;
+        line-height: 34px;
+        font-size: .7rem;
+      }
+    }
   </style>
 
 </head>
@@ -191,14 +260,14 @@ document.addEventListener("DOMContentLoaded", () => {
     <!-- ======= CATEGORIES ======= -->
 
     <section class="category" id="brunch" data-label="Brunch">
-      <div class="head"><h2>Brunch</h2><div class="sub" style="text-align: right;">9 am - 12 pm on weekdays<br>9 am - 3 pm on weekends</div></div>
+      <div class="head"><h2>Brunch</h2><div class="sub" style="text-align: right; color: #5d7a73;">9 am - 12 pm on weekdays<br>9 am - 3 pm on weekends</div></div>
       <div class="grid">
-        <article class="card"><div class="img-wrap"><img loading="lazy" src="Fotot/Brunch/Yummy Noor Avocado.jpeg" alt="YUMMY NOOR AVOCADO"><span class="price-badge">950 lek</span></div><div class="meta"><div class="title">YUMMY NOOR AVOCADO</div><div class="desc">Salmon, Avokado, Vezë Poshe, Krem Djathi, Salcë Portokalli, Pomodorini, Lime <br>Salmon, Avocado, Poached Eggs, Cream Cheese, Orange Dressing, Cherry Tomato, Lime </div></div></article>
+        <article class="card"><div class="meta"><div class="title">YUMMY NOOR AVOCADO<br><br></div><div class="desc">Salmon, Avokado, Vezë Poshe, Krem Djathi, Salcë Portokalli, Pomodorini, Lime <br>Salmon, Avocado, Poached Eggs, Cream Cheese, Orange Dressing, Cherry Tomato, Lime </div><span class="price-badge-1">950 lek</span></article>
         <article class="card"><div class="img-wrap"><img loading="lazy" src="Fotot/Brunch/Egg & Avocado.jpeg" alt="EGG & AVOCADO PIADINA "><span class="price-badge">790 lek</span></div><div class="meta"><div class="title">EGG & AVOCADO PIADINA </div><div class="desc">Piadinë, Vezë, Avokado, Proshutë Pule, Spinaq, Pomodorini, Salcë Caesar, Grana Padano <br>Wrap, Egg, Avocado, Chicken Ham, Spinach, Cherry Tomato, Caesar Sauce, Grana Padano</div></div></article>
-        <article class="card"><div class="img-wrap"><img loading="lazy" src="Fotot/Brunch/muesi bowl.jpg" alt="MUESLI BOWL"><span class="price-badge">650 lek</span></div><div class="meta"><div class="title">MUESLI BOWL</div><div class="desc">Musli, Fruta Pylli, Banane, Gjalpë Kikiriku, Kos <br>Muesli, Forest Fruits, Banana, Peanut Butter, Yogurt</div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="Fotot/Brunch/muesi bowl.jpeg" alt="MUESLI BOWL"><span class="price-badge">650 lek</span><span class="new-badge" aria-hidden="false" role="note" aria-label="New">NEW</span></div><div class="meta"><div class="title">MUESLI BOWL</div><div class="desc">Musli, Fruta Pylli, Banane, Gjalpë Kikiriku, Kos <br>Muesli, Forest Fruits, Banana, Peanut Butter, Yogurt</div></div></article>
         <article class="card"><div class="img-wrap"><img loading="lazy" src="Fotot/Brunch/egg benedict.jpeg" alt="EGGS BENEDICT"><span class="price-badge">700 lek</span></div><div class="meta"><div class="title">EGGS BENEDICT</div><div class="desc">Vezë Poshe, Pancetë, Salcë Hollandeze, Pomodorini <br>Poached Eggs, Bacon, Hollandaise Sauce, Cherry Tomato</div></div></article>
         <article class="card"><div class="img-wrap"><img loading="lazy" src="Fotot/Brunch/Chocofruit waffle 2.jpeg" alt="CHOCOFRUITS WAFFLE"><span class="price-badge">750 lek</span></div><div class="meta"><div class="title">CHOCOFRUITS WAFFLE</div><div class="desc">Waffle, Nutella, Luleshtrydhe, Banane, Fruta të Thata Miks <br>Waffle, Nutella, Strawberry, Banana, Mix of Dried Fruits</div></div></article>
-        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="PISTACCHIO WAFFLE"><span class="price-badge">800 lek</span></div><div class="meta"><div class="title">PISTACCHIO WAFFLE</div><div class="desc">Waffle, Krem Pistakio, Pistakio Kokërr, Luleshtrydhe <br>Waffle, Pistachio Cream, Pistachio, Strawberry</div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="Fotot/Brunch/pistacchio waffle.jpeg" alt="PISTACCHIO WAFFLE"><span class="price-badge">800 lek</span><span class="new-badge" aria-hidden="false" role="note" aria-label="New">NEW</span></div><div class="meta"><div class="title">PISTACCHIO WAFFLE</div><div class="desc">Waffle, Krem Pistakio, Pistakio Kokërr, Luleshtrydhe <br>Waffle, Pistachio Cream, Pistachio, Strawberry</div></div></article>
         <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="FRENCH TOAST"><span class="price-badge">700 lek</span></div><div class="meta"><div class="title">FRENCH TOAST</div><div class="desc">Bukë Briosh, Miks Qumësht & Vezë, Fruta, Shurup Panje <br>Brioche Bread, Mix of Milk & Eggs, Fruits, Maple Syrup</div></div></article>
         <article class="card"><div class="img-wrap"><img loading="lazy" src="Fotot/Brunch/Croque Madame.jpeg" alt="CROQUE MADAME"><span class="price-badge">700 lek</span></div><div class="meta"><div class="title">CROQUE MADAME</div><div class="desc">Vezë, Proshutë Pule, Beshamel, Mocarela, Djathë Guda, Krem Djathi <br>Egg, Chicken Ham, Béchamel, Mozzarella, Gouda Cheese, Cream Cheese</div></div></article>
       </div>
@@ -207,11 +276,11 @@ document.addEventListener("DOMContentLoaded", () => {
     <section class="category" id="salads" data-label="Salads">
       <div class="head"><h2>Salads</h2><div class="sub"></div></div>
       <div class="grid">
-        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="KAPREZE / Caprese"><span class="price-badge">650 lek</span></div><div class="meta"><div class="title">KAPREZE / Caprese</div><div class="desc">Mocarela, Pomodorini, Borzilok <br>Mozzarella, Cherry Tomato, Basil</div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="Fotot/Salads/kapreze.png" alt="KAPREZE / Caprese"><span class="price-badge">650 lek</span></div><div class="meta"><div class="title">KAPREZE / Caprese</div><div class="desc">Mocarela, Pomodorini, Borzilok <br>Mozzarella, Cherry Tomato, Basil</div></div></article>
         <article class="card"><div class="img-wrap"><img loading="lazy" src="Fotot/Salads/Avokado & Fileto Pule.jpeg" alt="AVOKADO & FILETO PULE / Avocado & Chicken Fillet"><span class="price-badge">690 lek</span></div><div class="meta"><div class="title">AVOKADO & FILETO PULE / Avocado & Chicken Fillet</div><div class="desc">Sallatë Miks, Rukola, Avokado, Fileto Pule, Domate e Thatë, Grana Padano, Pomodorini, Kastravec, Shkopinj Buke, Salcë Mustarde <br>Mix Salad, Arugula, Avocado, Chicken Fillet, Sun Dried Tomato, Grana Padano, Cherry Tomato, Cucumber, Grissini, Mustard Dressing</div></div></article>
         <article class="card"><div class="img-wrap"><img loading="lazy" src="Fotot/Salads/Ceasar.jpeg" alt="CEZAR / Caesar"><span class="price-badge">700 lek</span></div><div class="meta"><div class="title">CEZAR / Caesar</div><div class="desc">Fileto Pule, Sallatë Jeshile, Sallatë Ajsberg, Misër, Pomodorini, Grana Padano, Salcë Cezar <br>Chicken Fillet, Lettuce, Iceberg Salad, Corn, Cherry Tomato, Grana Padano, Caesar Dressing</div></div></article>
         <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="SALMON & AVOKADO / Salmon & Avocado "><span class="price-badge">850 lek</span></div><div class="meta"><div class="title">SALMON & AVOKADO / Salmon & Avocado </div><div class="desc">Salmon, Avokado, Sallatë Jeshile, Rukola, Pomodorini, Kastravec, Salcë Shef <br>Salmon, Avocado, Lettuce, Arugula, Cherry Tomato, Cucumber, Chef Dressing</div></div></article>
-        <article class="card"><div class="img-wrap"><img loading="lazy" src="Fotot/Salads/burrata.jpg" alt="BURRATA & CRUDO"><span class="price-badge">750 lek</span></div><div class="meta"><div class="title">BURRATA & CRUDO </div><div class="desc">Proshutë Krudo, Burrata, Rukola, Pomodorini, Salcë Shef <br>Raw Ham, Burrata, Arugula, Cherry Tomato, Chef Dressing</div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="Fotot/Salads/burrata.jpg" alt="BURRATA & CRUDO"><span class="price-badge">750 lek</span><span class="new-badge" aria-hidden="false" role="note" aria-label="New">NEW</span></div><div class="meta"><div class="title">BURRATA & CRUDO </div><div class="desc">Proshutë Krudo, Burrata, Rukola, Pomodorini, Salcë Shef <br>Raw Ham, Burrata, Arugula, Cherry Tomato, Chef Dressing</div></div></article>
       </div>
     </section>
 
@@ -225,20 +294,20 @@ document.addEventListener("DOMContentLoaded", () => {
     <section class="category" id="panini-piadinas" data-label="Panini &amp; Piadinas">
       <div class="head"><h2>Panini &amp; Piadinas</h2><div class="sub"></div></div>
       <div class="grid">
-        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="TRENGJYRESHE / Three Colors"><span class="price-badge">Panini: 530 lek <br>Piadina: 580 lek</span></div><div class="meta"><div class="title">TRENGJYRESHE / Three Colors</div><div class="desc">Cabata, Fokaçe, Straçatel, Proshutë Krudo, Domate e Thatë, Borzilok, Pesto Genovese <br>Ciabatta, Focaccia, Stracciatella, Row Ham, Sun Dried Tomato, Basil, Genovese Pesto</div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="Fotot/Panini & Piadina/three colors panini.jpeg" alt="TRENGJYRESHE / Three Colors"><span class="price-badge">Panini: 530 lek <br>Piadina: 580 lek</span><span class="new-badge" aria-hidden="false" role="note" aria-label="New">NEW</span></div><div class="meta"><div class="title">TRENGJYRESHE / Three Colors</div><div class="desc">Cabata, Fokaçe, Straçatel, Proshutë Krudo, Domate e Thatë, Borzilok, Pesto Genovese <br>Ciabatta, Focaccia, Stracciatella, Row Ham, Sun Dried Tomato, Basil, Genovese Pesto</div></div></article>
         <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="PANCETË & FILETO PULE / Bacon & Chicken Fillet"><span class="price-badge">Panini: 510 lek <br>Piadina: 560 lek</span></div><div class="meta"><div class="title">PANCETË & FILETO PULE / Bacon & Chicken Fillet</div><div class="desc">Cabata, Pancetë, Fileto Pule, Rukola, Kastravec, Salcë e Bardhë <br>Ciabatta, Bacon, Chicken Fillet, Arugula, Cucumber, White Sauce</div></div></article>
         <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="CEZAR / Caesar"><span class="price-badge">Panini: 400 lek <br>Piadina: 450 lek</span></div><div class="meta"><div class="title">CEZAR / Caesar</div><div class="desc">Cabata, Fileto Pule, Sallatë Jeshile, Grana Padano, Salcë Cezar <br>Ciabatta, Chicken Fillet, Lettuce, Grana Padano, Caesar Sauce</div></div></article>
         <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="VEZË TË SKUQURA / Fried Eggs"><span class="price-badge">Panini: 400 lek <br>Piadina: 450 lek</span></div><div class="meta"><div class="title">VEZË TË SKUQURA / Fried Eggs</div><div class="desc">Cabata, Vezë, Proshutë Koto, Provolone, Spinaq, Salcë Cezar <br>Ciabatta, Egg, Ham, Provolone, Spinach, Caesar Sauce</div></div></article>
-        <article class="card"><div class="img-wrap"><img loading="lazy" src="Fotot/Panini & Piadina/chili.jpg" alt="CHILI"><span class="price-badge">Panini: 530 lek <br>Piadina: 580 lek</span></div><div class="meta"><div class="title">CHILI</div><div class="desc">Fokaçe, Spianata Pikante, Provolone, Spec i Kuq, Rukola, Tabasco, Salcë Roze <br>Focaccia, Spianata Piccante, Provolone, Red Pepper, Arugula, Tabasco, Rose Sauce</div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="Fotot/Panini & Piadina/chili.jpg" alt="CHILI"><span class="price-badge">Panini: 530 lek <br>Piadina: 580 lek</span><span class="new-badge" aria-hidden="false" role="note" aria-label="New">NEW</span></div><div class="meta"><div class="title">CHILI</div><div class="desc">Fokaçe, Spianata Pikante, Provolone, Spec i Kuq, Rukola, Tabasco, Salcë Roze <br>Focaccia, Spianata Piccante, Provolone, Red Pepper, Arugula, Tabasco, Rose Sauce</div></div></article>
         <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="KAPRESE / Caprese"><span class="price-badge">Panini: 450 lek <br>Piadina: 500 lek</span></div><div class="meta"><div class="title">KAPRESE / Caprese</div><div class="desc">Cabata, Mocarela, Domate, Borzilok, Pesto Genovese <br>Ciabatta, Mozzarella, Tomato, Basil, Genovese Pesto</div></div></article>
-        <article class="card"><div class="img-wrap"><img loading="lazy" src="Fotot/Panini & Piadina/krudo.jpg" alt="KRUDO / Crudo"><span class="price-badge">Panini: 530 lek <br>Piadina: 580 lek</span></div><div class="meta"><div class="title">KRUDO / Crudo</div><div class="desc">Fokaçe, Proshutë Krudo, Kungull, Krem Tartufi, Krem Pekorino <br>Focaccia, Raw Ham, Zucchini, Truffle Cream, Pecorino Cream</div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="Fotot/Panini & Piadina/krudo.jpg" alt="KRUDO / Crudo"><span class="price-badge">Panini: 530 lek <br>Piadina: 580 lek</span><span class="new-badge" aria-hidden="false" role="note" aria-label="New">NEW</span></div><div class="meta"><div class="title">KRUDO / Crudo</div><div class="desc">Fokaçe, Proshutë Krudo, Kungull, Krem Tartufi, Krem Pekorino <br>Focaccia, Raw Ham, Zucchini, Truffle Cream, Pecorino Cream</div></div></article>
       </div>
     </section>
 
     <section class="category" id="pasta" data-label="Pasta">
       <div class="head"><h2>Pasta</h2><div class="sub"></div></div>
       <div class="grid">
-        <article class="card"><div class="img-wrap"><img loading="lazy" src="Fotot/Pasta/paceri guanciale dhe stracatela.jpg" alt="PACCHERI GUANCIALE & STRACCIATELLA"><span class="price-badge">750 lek</span></div><div class="meta"><div class="title">PACCHERI GUANCIALE & STRACCIATELLA</div><div class="desc">Pakeri të Freskëta, Guanciale, Stacciatella, Salcë Domate, Borzilok, Grana Padano<br>Fresh Paccheri, Guanciale, Stracciatella, Tomato Sauce, Basil, Grana Padano</div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="Fotot/Pasta/paceri guanciale dhe stracatela.jpg" alt="PACCHERI GUANCIALE & STRACCIATELLA"><span class="price-badge">750 lek</span><span class="new-badge" aria-hidden="false" role="note" aria-label="New">NEW</span></div><div class="meta"><div class="title">PACCHERI GUANCIALE & STRACCIATELLA</div><div class="desc">Pakeri të Freskëta, Guanciale, Stacciatella, Salcë Domate, Borzilok, Grana Padano<br>Fresh Paccheri, Guanciale, Stracciatella, Tomato Sauce, Basil, Grana Padano</div></div></article>
         <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="POMODORINI & BORZILOK / Cherry Tomato & Basil"><span class="price-badge">650 lek</span></div><div class="meta"><div class="title">POMODORINI & BORZILOK / Cherry Tomato & Basil</div><div class="desc">Linguine të Freskëta, Pomodorini, Borzilok, Pesto Genovese, Grana Padano <br>Fresh Linguine, Cherry Tomato, Basil, Genovese Pesto, Grana Padano</div></div></article>
         <article class="card"><div class="img-wrap"><img loading="lazy" src="Fotot/Pasta/Amatriciana.jpeg" alt="AMATRICIANA"><span class="price-badge">750 lek</span></div><div class="meta"><div class="title">AMATRICIANA</div><div class="desc">Linguine të Freskëta, Pancetë, Pomodorini, Salcë Domate, Tabasco, Grana Padano <br>Fresh Linguine, Bacon, Cherry Tomato, Tomato Sauce, Tabasco, Grana Padano</div></div></article>
         <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="ARRABIATA"><span class="price-badge">600 lek</span></div><div class="meta"><div class="title">ARRABIATA</div><div class="desc">Rigatoni të Freskëta, Salcë Domate, Hudhër, Spec Djegës, Majdanoz, Grana Padano <br>Fresh Rigatoni, Tomato Sauce, Garlic, Chili Pepper, Parsley, Grana Padano</div></div></article>
@@ -247,7 +316,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="AGLIO, OLIO & PEPERONCINO "><span class="price-badge">600 lek</span></div><div class="meta"><div class="title">AGLIO, OLIO & PEPERONCINO </div><div class="desc">Linguine të Freskëta, Hudhër, Vaj Ulliri, Spec Djegës, Grana Padano <br>Fresh Linguine, Garlic, Olive Oil, Chili Pepper, Grana Padano</div></div></article>
         <article class="card"><div class="img-wrap"><img loading="lazy" src="Fotot/Pasta/Rigatoni Fileto pule & Mocarela.jpeg" alt="FILETO PULE & MOCARELA / Chicken Fillet & Mozzarella"><span class="price-badge">790 lek</span></div><div class="meta"><div class="title">FILETO PULE & MOCARELA / Chicken Fillet & Mozzarella</div><div class="desc">Rigatoni të Freskëta, Fileto Pule, Mocarela, Spinaq, Salcë Domate, Grana Padano <br>Fresh Rigatoni, Chicken Fillet, Mozzarella, Spinach, Tomato Sauce, Grana Padano</div></div></article>
         <article class="card"><div class="img-wrap"><img loading="lazy" src="Fotot/Pasta/Tagliatelle Karkalec & Kungull.jpeg" alt="KARKALEC & KUNGULL / Shrimp & Zucchini"><span class="price-badge">790 lek</span></div><div class="meta"><div class="title">KARKALEC & KUNGULL / Shrimp & Zucchini</div><div class="desc">Tagliatelle të Freskëta, Karkalec, Kungull, Pomodorini, Hudhër, Grana Padano <br>Fresh Tagliatelle, Shrimp, Zucchini, Cherry Tomato, Garlic, Grana Padano</div></div></article>
-        <article class="card"><div class="img-wrap"><img loading="lazy" src="Fotot/Pasta/ravioli domate borzilok.jpg" alt="RAVIOLI DOMATE & BORZILOK / Tomato & Basil Ravioli"><span class="price-badge">750 lek</span></div><div class="meta"><div class="title">RAVIOLI DOMATE & BORZILOK / Tomato & Basil Ravioli</div><div class="desc">Ravioli të Freskëta, Salcë Domate, Domate, Borzilok, Grana Padano, Pana <br>Fresh Ravioli, Tomato Sauce, Tomato, Basil, Grana Padano, Heavy Cream</div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="Fotot/Pasta/ravioli domate borzilok.jpg" alt="RAVIOLI DOMATE & BORZILOK / Tomato & Basil Ravioli"><span class="price-badge">750 lek</span><span class="new-badge" aria-hidden="false" role="note" aria-label="New">NEW</span></div><div class="meta"><div class="title">RAVIOLI DOMATE & BORZILOK / Tomato & Basil Ravioli</div><div class="desc">Ravioli të Freskëta, Salcë Domate, Domate, Borzilok, Grana Padano, Pana <br>Fresh Ravioli, Tomato Sauce, Tomato, Basil, Grana Padano, Heavy Cream</div></div></article>
       </div>
     </section>
 
@@ -257,7 +326,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="KREM SPINAQI & PANCETË / Spinach Cream & Bacon"><span class="price-badge">780 lek</span></div><div class="meta"><div class="title">KREM SPINAQI & PANCETË / Spinach Cream & Bacon</div><div class="desc">Oriz Carnaroli, Pancetë, Spinaq, Stika Pishe, Gorgonzola, Krem Djathi, Grana Padano <br>Carnaroli Rice, Bacon, Spinach, Pine Nuts, Gorgonzola, Cream Cheese, Grana Padano</div></div></article>
         <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="FILETO PULE & PERIME / Chicken Fillet & Vegetable "><span class="price-badge">750 lek</span></div><div class="meta"><div class="title">FILETO PULE & PERIME / Chicken Fillet & Vegetable </div><div class="desc">Oriz Carnaroli, Fileto Pule, Spec i Kuq, Kungull, Karrotë, Kërpudhë, Misër, Grana Padano <br>Carnaroli Rice, Chicken Fillet, Red Pepper, Zucchini, Carrot, Mushroom, Corn, Grana Padano</div></div></article>
         <article class="card"><div class="img-wrap"><img loading="lazy" src="Fotot/Risottos/Tartuf & Kerpudhe.jpeg" alt="TARTUF & KËRPUDHË / Truffle & Mushroom "><span class="price-badge">780 lek</span></div><div class="meta"><div class="title">TARTUF & KËRPUDHË / Truffle & Mushroom </div><div class="desc">Oriz Carnaroli, Krem Tartufi, Kërpudhë, Pana, Grana Padano <br>Carnaroli Rice, Truffle Cream, Mushroom, Heavy Cream, Grana Padano</div></div></article>
-        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="KARKALEC & ASPARAG / Shrimp & Asparagus "><span class="price-badge">850 lek</span></div><div class="meta"><div class="title">KARKALEC & ASPARAG / Shrimp & Asparagus </div><div class="desc">Oriz Carnaroli, Karkalec, Asparag, Krem Tartufi, Grana Padano, Pana <br>Carnaroli Rice, Shrimp, Asparagus, Truffle Cream, Grana Padano, Heavy Cream</div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="KARKALEC & ASPARAG / Shrimp & Asparagus "><span class="price-badge">850 lek</span><span class="new-badge" aria-hidden="false" role="note" aria-label="New">NEW</span></div><div class="meta"><div class="title">KARKALEC & ASPARAG / Shrimp & Asparagus </div><div class="desc">Oriz Carnaroli, Karkalec, Asparag, Krem Tartufi, Grana Padano, Pana <br>Carnaroli Rice, Shrimp, Asparagus, Truffle Cream, Grana Padano, Heavy Cream</div></div></article>
       </div>
     </section>
 
@@ -266,7 +335,7 @@ document.addEventListener("DOMContentLoaded", () => {
       <div class="grid">
         <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="KËRPUDHA & SHAFRAN / Mushroom & Saffron"><span class="price-badge">850 lek</span></div><div class="meta"><div class="title">KËRPUDHA & SHAFRAN / Mushroom & Saffron</div><div class="desc">Fileto Pule, Kërpudhë, Spec i Kuq, Shafran, Pana, Grana Padano <br>Chicken Fillet, Mushroom, Red Pepper, Saffron, Heavy Cream, Grana Padano</div></div></article>
         <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="DEMI-GLACÉ"><span class="price-badge">850 lek</span></div><div class="meta"><div class="title">DEMI-GLACÉ</div><div class="desc">Fileto Pule, Salcë Demi-Glacé, Spinaq, Patate Baby <br>Chicken Fillet, Demi-Glace Sauce, Spinach, Baby Potato</div></div></article>
-        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="PURE KORROTE & PERIME / Carrot Puree & Vegetable"><span class="price-badge">850 lek</span></div><div class="meta"><div class="title">PURE KORROTE & PERIME / Carrot Puree & Vegetable</div><div class="desc">Fileto Pule, Karrotë, Asparag, Brokoli <br>Chicken Fillet, Carrot, Asparagus Broccoli</div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="PURE KORROTE & PERIME / Carrot Puree & Vegetable"><span class="price-badge">850 lek</span><span class="new-badge" aria-hidden="false" role="note" aria-label="New">NEW</span></div><div class="meta"><div class="title">PURE KORROTE & PERIME / Carrot Puree & Vegetable</div><div class="desc">Fileto Pule, Karrotë, Asparag, Brokoli <br>Chicken Fillet, Carrot, Asparagus Broccoli</div></div></article>
       </div>
     </section>
 
@@ -284,14 +353,14 @@ document.addEventListener("DOMContentLoaded", () => {
       <div class="grid">
         <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="MORBIDA DI STELLE "><span class="price-badge">450 lek</span></div><div class="meta"><div class="title">MORBIDA DI STELLE </div><div class="desc">Krem Cokollate, Bazë Krokante Biskotash me Kakao, Dekor me Yje Sheqeri <br>Chocolate Cream, Crunchy Base Of Cocoa Biscuits, Decorated With Sugar Stars</div></div></article>
         <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="CROSTATA AI FRUTTI DI BOSCO "><span class="price-badge">450 lek</span></div><div class="meta"><div class="title">CROSTATA AI FRUTTI DI BOSCO </div><div class="desc">Krem Pasticerie, Fruta Pylli, Fruta të Thata Miks <br>Custard, Forest Fruits, Mix Dried Fruits</div></div></article>
-        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="TIRAMISU-ja JONE / Our Tiramisu "><span class="price-badge">500 lek</span></div><div class="meta"><div class="title">TIRAMISU-ja JONE / Our Tiramisu </div><div class="desc">Mascarpone, Vezë, Biskota Savoiardi, Kafe, Kakao <br>Mascarpone, Egg, Savoiardi Biscuits, Espresso, Cacao</div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="Fotot/Desserts/tiramisu.jpeg" alt="TIRAMISU-ja JONE / Our Tiramisu "><span class="price-badge">500 lek</span><span class="new-badge" aria-hidden="false" role="note" aria-label="New">NEW</span></div><div class="meta"><div class="title">TIRAMISU-ja JONE / Our Tiramisu </div><div class="desc">Mascarpone, Vezë, Biskota Savoiardi, Kafe, Kakao <br>Mascarpone, Egg, Savoiardi Biscuits, Espresso, Cacao</div></div></article>
       </div>
     </section>
 
     <section class="category" id="antipasts" data-label="Antipasts">
       <div class="head"><h2>Appetizers</h2><div class="sub"></div></div>
       <div class="grid">
-        <article class="card"><div class="img-wrap"><img loading="lazy" src="Fotot/Appetizers/burger.jpg" alt="BURGER"><span class="price-badge">900 lek</span></div><div class="meta"><div class="title">BURGER</div><div class="desc">Qofte me Mish Black Angus, Djathë Cedar, Kastravec Turshi, Qepë e Karamelizuar, Domate, Sallatë Jeshile, Krem Djathi, Patate të Skuqura <br>Black Angus Meat Patty, Cheddar Cheese, Pickles, Caramelized Onion, Tomato, Lettuce, Cream Cheese, French Fries</div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="Fotot/Appetizers/burger.jpg" alt="BURGER"><span class="price-badge">900 lek</span><span class="new-badge" aria-hidden="false" role="note" aria-label="New">NEW</span></div><div class="meta"><div class="title">BURGER</div><div class="desc">Qofte me Mish Black Angus, Djathë Cedar, Kastravec Turshi, Qepë e Karamelizuar, Domate, Sallatë Jeshile, Krem Djathi, Patate të Skuqura <br>Black Angus Meat Patty, Cheddar Cheese, Pickles, Caramelized Onion, Tomato, Lettuce, Cream Cheese, French Fries</div></div></article>
         <article class="card"><div class="img-wrap"><img loading="lazy" src="Fotot/Appetizers/Mini Burgers.jpeg" alt="MINI BURGERS / Mini Burgers "><span class="price-badge">750 lek</span></div><div class="meta"><div class="title">MINI BURGERS / Mini Burgers </div><div class="desc">Kotoleta Pule, Qepë e Karamelizuar, Kastravec Turshi, Salcë Cezar, Rrathë Qepe <br>Chicken Cutlet, Caramelized Onion, Pickle, Caesar Sauce, Onion Rings </div></div></article>
         <article class="card"><div class="img-wrap"><img loading="lazy" src="Fotot/Appetizers/Tacos pule.jpeg" alt="TACOS PULE / Chicken Tacos "><span class="price-badge">800 lek</span></div><div class="meta"><div class="title">TACOS PULE / Chicken Tacos </div><div class="desc">Fileto Pule, Spec i Kuq, Salcë Demi-Glacé, Salcë Cezar <br>Chicken Fillet, Red Pepper, Demi-Glacé Sauce, Caesar Sauce</div></div></article>
         <article class="card"><div class="img-wrap"><img loading="lazy" src="Fotot/Appetizers/Beef tacos.jpeg" alt="TAKOS MISH VICI / Beef Tacos "><span class="price-badge">950 lek</span></div><div class="meta"><div class="title">TAKOS MISH VICI / Beef Tacos </div><div class="desc">Mish Vici, Djathë Cheddar, Salcë Demi-Glacé, Spec Djegës, Majdanoz <br>Beef, Cheddar Cheese, Demi-Glacé Sauce, Chili Pepper, Parsley</div></div></article>
@@ -314,24 +383,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 Salmon, Capers, Cucumber, Cream Cheese
               </div>
             </div>
-
-            <!-- 2️⃣ Mozzarella & Cherry Tomato -->
-            <div class="img-wrap">
-              <img loading="lazy" src="Fotot/Appetizers/Mozzarella&Tomato.jpeg" alt="MOCARELA & POMODORINI / Mozzarella & Cherry Tomato">
-              <span class="price-badge">650 lek</span>
-            </div>
             <div class="meta">
               <div class="title">MOCARELA & POMODORINI / Mozzarella & Cherry Tomato</div>
               <div class="desc">
                 Mocarela, Pomodorini, Borzilok, Aceto Balsamike Krem<br>
                 Mozzarella, Cherry Tomato, Basil, Balsamic Vinegar Cream
               </div>
-            </div>
-
-            <!-- 3️⃣ Tomato & Avocado -->
-            <div class="img-wrap">
-              <img loading="lazy" src="Fotot/Appetizers/Tomato&Avocado.jpeg" alt="DOMATE & AVOKADO / Tomato & Avocado">
-              <span class="price-badge">650 lek</span>
             </div>
             <div class="meta">
               <div class="title">DOMATE & AVOKADO / Tomato & Avocado</div>
@@ -341,7 +398,7 @@ document.addEventListener("DOMContentLoaded", () => {
               </div>
             </div>
           </article>
-        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="DJATHË & PROSHUTË MIKS / Cheese & Ham Mix"><span class="price-badge">1500 lek</span></div><div class="meta"><div class="title">DJATHË & PROSHUTË MIKS / Cheese & Ham Mix</div><div class="desc">Caciotta Pikante, Pecorino Romano, Brie, Sallam me Tartuf, Proshutë Krudo, Sallam me Rozmarinë, Kastravec Turshi, Ullinj, Mjaltë, Arra, Shkopinj Buke, Taralli, Fruta <br>Caciotta Piccante, Pecorino Romano, Brie, Truffle Salami, Row Ham, Rosemary Salami, Pickles, Olives, Honey, Nuts, Grissini, Taralli, Fruits</div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="Fotot/Appetizers/cheese & ham mix.jpeg" alt="DJATHË & PROSHUTË MIKS / Cheese & Ham Mix"><span class="price-badge">1500 lek</span><span class="new-badge" aria-hidden="false" role="note" aria-label="New">NEW</span></div><div class="meta"><div class="title">DJATHË & PROSHUTË MIKS / Cheese & Ham Mix</div><div class="desc">Caciotta Pikante, Pecorino Romano, Brie, Sallam me Tartuf, Proshutë Krudo, Sallam me Rozmarinë, Kastravec Turshi, Ullinj, Mjaltë, Arra, Shkopinj Buke, Taralli, Fruta <br>Caciotta Piccante, Pecorino Romano, Brie, Truffle Salami, Row Ham, Rosemary Salami, Pickles, Olives, Honey, Nuts, Grissini, Taralli, Fruits</div></div></article>
         <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="ANTIPASTA E SHTËPISË / Appetizer Of The House "><span class="price-badge">1650 lek</span></div><div class="meta"><div class="title">ANTIPASTA E SHTËPISË / Appetizer Of The House </div><div class="desc">Chicken Fingers, Salcice, Spring Rolls, Patate të Skuqura, Salcë Sweet Chili, Salcë Cezar <br>Chicken Fingers, Sausage, Spring Rolls, French Fries, Sweet Chili Sauce, Caesar Sauce</div></div></article>
       </div>
     </section>
@@ -353,9 +410,9 @@ document.addEventListener("DOMContentLoaded", () => {
         <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="SHEGA"><span class="price-badge">750 lek</span></div><div class="meta"><div class="title">SHEGA</div><div class="desc">Pomegranate, Spumante</div></div></article>
         <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="PORNSTAR"><span class="price-badge">750 lek</span></div><div class="meta"><div class="title">PORNSTAR</div><div class="desc">Passion Fruit, Spumante</div></div></article>
         <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="WATERMELON SPRITZ"><span class="price-badge">750 lek</span></div><div class="meta"><div class="title">WATERMELON SPRITZ</div><div class="desc">Watermelon, Lime, Spumante</div></div></article>
-        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="VENICE"><span class="price-badge">750 lek</span></div><div class="meta"><div class="title">VENICE</div><div class="desc">Vermouth Rosso, Dry Vermouth, Elderflower, Angostura, Spumante</div></div></article>
-        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="COCO"><span class="price-badge">750 lek</span></div><div class="meta"><div class="title">COCO</div><div class="desc">Gin, Coconut Syrup, Lime</div></div></article>
-        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt=""><span class="price-badge">750 lek</span></div><div class="meta"><div class="title">CROQUE MADAME</div><div class="desc"></div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="VENICE"><span class="price-badge">750 lek</span><span class="new-badge" aria-hidden="false" role="note" aria-label="New">NEW</span></div><div class="meta"><div class="title">VENICE</div><div class="desc">Vermouth Rosso, Dry Vermouth, Elderflower, Angostura, Spumante</div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="COCO"><span class="price-badge">750 lek</span><span class="new-badge" aria-hidden="false" role="note" aria-label="New">NEW</span></div><div class="meta"><div class="title">COCO</div><div class="desc">Gin, Coconut Syrup, Lime</div></div></article>
+        
       </div>
     </section>
 
@@ -382,11 +439,11 @@ document.addEventListener("DOMContentLoaded", () => {
         <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="MEDELLIN"><span class="price-badge">850 lek</span></div><div class="meta"><div class="title">MEDELLIN</div><div class="desc">Vodka, Vermouth, Passion Fruit Liqueur, Strawberry, Basil</div></div></article>
         <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="MAMA"><span class="price-badge">850 lek</span></div><div class="meta"><div class="title">MAMA</div><div class="desc">Vodka, Orange Liqueur, Strawberry, Ginger</div></div></article>
         <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="ROME"><span class="price-badge">850 lek</span></div><div class="meta"><div class="title">ROME</div><div class="desc">Gin, Italicus Liqueur, Basil</div></div></article>
-        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="PILIVESA"><span class="price-badge">850 lek</span></div><div class="meta"><div class="title">PILIVESA</div><div class="desc">Rum, Jagermeister, Elderflower Liqueur, Mint, Lemon</div></div></article>
-        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="ROSEMARY"><span class="price-badge">850 lek</span></div><div class="meta"><div class="title">ROSEMARY</div><div class="desc">Vodka, Prosecco, Simple Syrup, Lemon</div></div></article>
-        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="GUAPA"><span class="price-badge">850 lek</span></div><div class="meta"><div class="title">GUAPA</div><div class="desc">Vodka, Triple Sec, Simple Syrup, Pomegranate, Lime</div></div></article>
-        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="FLAMA"><span class="price-badge">850 lek</span></div><div class="meta"><div class="title">FLAMA</div><div class="desc">Tequila, Triple Sec, Orange, Tabasco, Chili Pepper</div></div></article>
-        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="PLIS"><span class="price-badge">850 lek</span></div><div class="meta"><div class="title">PLIS</div><div class="desc">Gin, Limoncello, Simple Syrup, Lime</div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="PILIVESA"><span class="price-badge">850 lek</span><span class="new-badge" aria-hidden="false" role="note" aria-label="New">NEW</span></div><div class="meta"><div class="title">PILIVESA</div><div class="desc">Rum, Jagermeister, Elderflower Liqueur, Mint, Lemon</div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="ROSEMARY"><span class="price-badge">850 lek</span><span class="new-badge" aria-hidden="false" role="note" aria-label="New">NEW</span></div><div class="meta"><div class="title">ROSEMARY</div><div class="desc">Vodka, Prosecco, Simple Syrup, Lemon</div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="GUAPA"><span class="price-badge">850 lek</span><span class="new-badge" aria-hidden="false" role="note" aria-label="New">NEW</span></div><div class="meta"><div class="title">GUAPA</div><div class="desc">Vodka, Triple Sec, Simple Syrup, Pomegranate, Lime</div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="FLAMA"><span class="price-badge">850 lek</span><span class="new-badge" aria-hidden="false" role="note" aria-label="New">NEW</span></div><div class="meta"><div class="title">FLAMA</div><div class="desc">Tequila, Triple Sec, Orange, Tabasco, Chili Pepper</div></div></article>
+        <article class="card"><div class="img-wrap"><img loading="lazy" src="" alt="PLIS"><span class="price-badge">850 lek</span><span class="new-badge" aria-hidden="false" role="note" aria-label="New">NEW</span></div><div class="meta"><div class="title">PLIS</div><div class="desc">Gin, Limoncello, Simple Syrup, Lime</div></div></article>
       </div>
     </section>
 
